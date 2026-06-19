@@ -1,6 +1,7 @@
+using UserService.Domain.Enums;
 using Shared.Domain.Primitives;
 using Shared.Domain.ValueObjects;
-using UserService.Domain.Enums;
+
 
 namespace UserService.Domain.Events;
  

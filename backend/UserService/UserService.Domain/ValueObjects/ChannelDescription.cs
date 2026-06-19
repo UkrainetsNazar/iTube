@@ -1,4 +1,4 @@
-using Shared.Common;
+using Shared.Domain.Common;
 using Shared.Domain.Primitives;
 
 namespace UserService.Domain.ValueObjects;

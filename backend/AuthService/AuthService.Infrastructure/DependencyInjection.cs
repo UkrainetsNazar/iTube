@@ -1,5 +1,5 @@
 using AuthService.Application.Interfaces;
-using AuthService.Infrastructure.Persistance;
+using AuthService.Infrastructure.Persistence;
 using AuthService.Infrastructure.Repositories;
 using AuthService.Infrastructure.Security;
 using Microsoft.EntityFrameworkCore;
