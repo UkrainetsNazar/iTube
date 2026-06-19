@@ -1,5 +1,5 @@
 using System.Text.RegularExpressions;
-using Shared.Common;
+using Shared.Domain.Common;
 using Shared.Domain.Primitives;
 
 namespace AuthService.Domain.ValueObjects;

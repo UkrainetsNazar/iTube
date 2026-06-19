@@ -1,7 +1,7 @@
 using AuthService.Domain.Enums;
 using AuthService.Domain.Events;
 using AuthService.Domain.ValueObjects;
-using Shared.Common;
+using Shared.Domain.Common;
 using Shared.Domain.Primitives;
 using Shared.Domain.ValueObjects;
 
