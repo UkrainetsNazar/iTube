@@ -1,3 +1,5 @@
+using Shared.Domain.Interfaces;
+
 namespace Shared.Domain.Primitives;
 
 public abstract record DomainEvent : IDomainEvent
