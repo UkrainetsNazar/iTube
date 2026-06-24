@@ -1,0 +1,81 @@
+@baseUrl = http://localhost:5001/api/auth
+@email = testuser@example.com
+@password = Test1234!
+@newPassword = NewTest1234!
+
+### Register
+POST {{baseUrl}}/register
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+### Confirm Email (замінити token на той що прийшов на пошту)
+POST {{baseUrl}}/confirm-email
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "token": "YOUR_CONFIRMATION_TOKEN_HERE"
+}
+
+### Login
+# @name login
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+### Зберегти токени з відповіді Login
+@accessToken = {{login.response.body.accessToken}}
+@refreshToken = {{login.response.body.refreshToken}}
+
+### Refresh Token
+# @name refresh
+POST {{baseUrl}}/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+### Logout
+POST {{baseUrl}}/logout
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+### Change Password (потребує JWT)
+POST {{baseUrl}}/change-password
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "oldPassword": "{{password}}",
+  "newPassword": "{{newPassword}}"
+}
+
+### Forgot Password
+POST {{baseUrl}}/forgot-password
+Content-Type: application/json
+
+{
+  "email": "{{email}}"
+}
+
+### Reset Password (замінити token на той що прийшов на пошту)
+POST {{baseUrl}}/reset-password
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "token": "YOUR_RESET_TOKEN_HERE",
+  "newPassword": "{{newPassword}}"
+}
