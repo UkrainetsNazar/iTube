@@ -3,4 +3,4 @@ using Shared.Domain.ValueObjects;
 
 namespace AuthService.Domain.Events;
 
-public sealed record UserLoggedIn(UserId UserId) : DomainEvent;
+public sealed record UserRegisteredDomainEvent(UserId UserId, string Email) : DomainEvent;

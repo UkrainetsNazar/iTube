@@ -15,8 +15,12 @@ public sealed class User : AggregateRoot<UserId>
     public AccountStatus Status { get; private set; }
     public bool IsEmailConfirmed { get; private set; }
     public string? EmailConfirmationToken { get; private set; }
+    public DateTime? EmailConfirmationTokenExpiresAt { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime? LastLoginAt { get; private set; }
+
+    private PasswordResetToken? _passwordResetToken;
+    public PasswordResetToken? PasswordResetToken => _passwordResetToken;
 
     private readonly List<RefreshToken> _refreshTokens = [];
     public IReadOnlyList<RefreshToken> RefreshTokens => _refreshTokens.AsReadOnly();
@@ -39,10 +43,11 @@ public sealed class User : AggregateRoot<UserId>
     {
         var user = new User(UserId.New(), email, passwordHash)
         {
-            EmailConfirmationToken = Guid.NewGuid().ToString("N")
+            EmailConfirmationToken = Guid.NewGuid().ToString("N"),
+            EmailConfirmationTokenExpiresAt = DateTime.UtcNow.AddDays(7)
         };
 
-        user.RaiseDomainEvent(new UserRegistered(user.Id, user.Email.Value));
+        user.RaiseDomainEvent(new UserRegisteredDomainEvent(user.Id, user.Email.Value));
         return user;
     }
 
@@ -58,7 +63,7 @@ public sealed class User : AggregateRoot<UserId>
         EmailConfirmationToken = null;
         Status = AccountStatus.Active;
 
-        RaiseDomainEvent(new EmailConfirmed(Id));
+        RaiseDomainEvent(new EmailConfirmedDomainEvent(Id, Email.Value));
         return Result.Success();
     }
 
@@ -68,11 +73,29 @@ public sealed class User : AggregateRoot<UserId>
             return Result.Failure(Error.Conflict("User.NotActive", $"Login denied: account status — {Status}."));
 
         LastLoginAt = DateTime.UtcNow;
-        RaiseDomainEvent(new UserLoggedIn(Id));
         return Result.Success();
     }
 
     public void ChangePassword(PasswordHash newPasswordHash) => PasswordHash = newPasswordHash;
+
+    public void GeneratePasswordResetToken(string tokenHash, string rawToken)
+    {
+        _passwordResetToken = new PasswordResetToken(tokenHash, DateTime.UtcNow.AddHours(1));
+        RaiseDomainEvent(new PasswordResetRequestedDomainEvent(Id, Email.Value, rawToken));
+    }
+
+    public Result ResetPassword(string tokenHash, PasswordHash newPasswordHash)
+    {
+        if (_passwordResetToken is null || !_passwordResetToken.IsValid)
+            return Result.Failure(Error.Validation("User.InvalidResetToken", "Reset token is invalid or expired."));
+
+        if (_passwordResetToken.TokenHash != tokenHash)
+            return Result.Failure(Error.Validation("User.InvalidResetToken", "Reset token is invalid or expired."));
+
+        PasswordHash = newPasswordHash;
+        _passwordResetToken.MarkAsUsed();
+        return Result.Success();
+    }
 
     public RefreshToken IssueRefreshToken(string tokenHash, DateTime expiresAt)
     {
@@ -81,11 +104,14 @@ public sealed class User : AggregateRoot<UserId>
         return token;
     }
 
-    public Result RevokeRefreshToken(Guid refreshTokenId)
+    public Result RevokeRefreshToken(string tokenHash)
     {
-        var token = _refreshTokens.FirstOrDefault(t => t.Id == refreshTokenId);
+        var token = _refreshTokens.FirstOrDefault(t => t.TokenHash == tokenHash);
         if (token is null)
-            return Result.Failure(Error.NotFound("RefreshToken.NotFound", "Refresh-token was not founded."));
+            return Result.Failure(Error.NotFound("RefreshToken.NotFound", "Token not found."));
+
+        if (!token.IsActive)
+            return Result.Failure(Error.Conflict("RefreshToken.NotActive", "Token is already revoked or expired."));
 
         token.Revoke();
         return Result.Success();
