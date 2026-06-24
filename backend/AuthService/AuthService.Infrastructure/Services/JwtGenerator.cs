@@ -7,9 +7,9 @@ using AuthService.Domain.Entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
-namespace AuthService.Infrastructure.Security;
+namespace AuthService.Infrastructure.Services;
 
-public class JwtGenerator(IConfiguration configuration) : IJwtGenerator
+public sealed class JwtGenerator(IConfiguration configuration) : IJwtGenerator
 {
     public string GenerateAccessToken(User user)
     {
@@ -18,8 +18,8 @@ public class JwtGenerator(IConfiguration configuration) : IJwtGenerator
 
         var claims = new[]
         {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Email, user.Email.ToString()),
+            new Claim(ClaimTypes.NameIdentifier, user.Id.Value.ToString()),
+            new Claim(ClaimTypes.Email, user.Email.Value),
             new Claim(ClaimTypes.Role, user.Role.ToString())
         };
 

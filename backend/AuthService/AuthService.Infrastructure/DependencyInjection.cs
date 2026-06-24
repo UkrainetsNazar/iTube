@@ -1,10 +1,12 @@
 using AuthService.Application.Interfaces;
 using AuthService.Infrastructure.Persistence;
 using AuthService.Infrastructure.Repositories;
-using AuthService.Infrastructure.Security;
+using AuthService.Infrastructure.Services;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Shared.Domain.Interfaces;
 
 namespace AuthService.Infrastructure;
 
@@ -19,6 +21,29 @@ public static class DependencyInjection
 
         services.AddScoped<IJwtGenerator, JwtGenerator>();
         services.AddScoped<IPasswordHasher, PasswordHasher>();
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IEmailSender, SmtpEmailSender>();
+
+        services.AddMassTransit(busConfigurator =>
+        {
+            busConfigurator.AddEntityFrameworkOutbox<AuthDbContext>(outboxConfigurator =>
+            {
+                outboxConfigurator.UsePostgres();
+                outboxConfigurator.UseBusOutbox();
+            });
+
+            busConfigurator.UsingRabbitMq((context, cfg) =>
+            {
+                cfg.Host(configuration["RabbitMQ:Host"], "/", h =>
+                {
+                    h.Username(configuration["RabbitMQ:Username"]!);
+                    h.Password(configuration["RabbitMQ:Password"]!);
+                });
+
+                cfg.ConfigureEndpoints(context);
+            });
+        });
 
         return services;
     }

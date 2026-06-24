@@ -60,5 +60,19 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<User>
             .IsConcurrencyToken();
 
         builder.Ignore(u => u.DomainEvents);
+
+        builder.OwnsOne(u => u.PasswordResetToken, tokenBuilder =>
+        {
+            tokenBuilder.Property(t => t.TokenHash)
+                .HasColumnName("PasswordResetTokenHash")
+                .HasMaxLength(512);
+
+            tokenBuilder.Property(t => t.ExpiresAt)
+                .HasColumnName("PasswordResetTokenExpiresAt");
+
+            tokenBuilder.Property(t => t.IsUsed)
+                .HasColumnName("PasswordResetTokenIsUsed")
+                .HasDefaultValue(false);
+        });
     }
 }

@@ -1,8 +1,8 @@
 using AuthService.Application.Interfaces;
 
-namespace AuthService.Infrastructure.Repositories;
+namespace AuthService.Infrastructure.Services;
 
-public class PasswordHasher : IPasswordHasher
+public sealed class PasswordHasher : IPasswordHasher
 {
     public string Hash(string password) =>
         BCrypt.Net.BCrypt.HashPassword(password);
