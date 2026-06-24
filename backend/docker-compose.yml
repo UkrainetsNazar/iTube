@@ -1,0 +1,66 @@
+services:
+
+  auth-db:
+    image: postgres:16-alpine
+    container_name: itube-auth-db
+    environment:
+      POSTGRES_DB: auth_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - auth-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: itube-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: AuthService/AuthService.API/Dockerfile
+    container_name: itube-auth-service
+    ports:
+      - "5001:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__AuthDb=Host=auth-db;Port=5432;Database=auth_db;Username=postgres;Password=postgres
+      - Jwt__Secret=super-secret-key-minimum-32-characters-long
+      - Jwt__Issuer=itube
+      - Jwt__Audience=itube
+      - Smtp__Host=sandbox.smtp.mailtrap.io
+      - Smtp__Port=587
+      - Smtp__User=your_user
+      - Smtp__Pass=your_pass
+      - Smtp__From=noreply@itube.com
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Username=guest
+      - RabbitMQ__Password=guest
+    depends_on:
+      auth-db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+volumes:
+  auth-db-data:
+  rabbitmq-data:
