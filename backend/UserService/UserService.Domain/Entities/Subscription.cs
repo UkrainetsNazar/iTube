@@ -9,7 +9,6 @@ public sealed class Subscription : AggregateRoot<Guid>
 {
     public UserId SubscriberId { get; private set; }
     public ChannelId TargetChannelId { get; private set; }
-    public bool IsActive { get; private set; }
     public bool IsMutual { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
@@ -21,7 +20,6 @@ public sealed class Subscription : AggregateRoot<Guid>
     {
         SubscriberId = subscriberId;
         TargetChannelId = targetChannelId;
-        IsActive = true;
         IsMutual = false;
         CreatedAt = DateTime.UtcNow;
     }
@@ -43,10 +41,6 @@ public sealed class Subscription : AggregateRoot<Guid>
 
     public Result Unsubscribe()
     {
-        if (!IsActive)
-            return Result.Failure(Error.Conflict("Subscription.AlreadyInactive", "The subscription is no longer active."));
-
-        IsActive = false;
         IsMutual = false;
         RaiseDomainEvent(new UserUnsubscribed(SubscriberId, TargetChannelId));
         return Result.Success();
