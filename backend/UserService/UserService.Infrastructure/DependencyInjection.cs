@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Domain.Interfaces;
 using UserService.Application.Interfaces;
+using UserService.Infrastructure.Consumers;
 using UserService.Infrastructure.Persistence;
 using UserService.Infrastructure.Repositories;
 
@@ -30,6 +31,8 @@ public static class DependencyInjection
                 outboxConfigurator.UsePostgres();
                 outboxConfigurator.UseBusOutbox();
             });
+
+            busConfigurator.AddConsumer<EmailConfirmedConsumer>();
 
             busConfigurator.UsingRabbitMq((context, cfg) =>
             {
