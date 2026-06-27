@@ -30,6 +30,10 @@ public sealed class UserAccountConfiguration : IEntityTypeConfiguration<UserAcco
 
         builder.OwnsOne(u => u.CurrentBan, banBuilder =>
         {
+            banBuilder.Property(b => b.UserId)
+                .HasConversion<UserIdConverter>()
+                .HasColumnName("BanUserId");
+
             banBuilder.Property(b => b.BannedByModeratorId)
                 .HasConversion<UserIdConverter>()
                 .HasColumnName("BanModeratorId");
@@ -56,6 +60,9 @@ public sealed class UserAccountConfiguration : IEntityTypeConfiguration<UserAcco
                 .ValueGeneratedOnAdd();
 
             historyBuilder.HasKey("Id");
+
+            historyBuilder.Property(h => h.UserId)
+                .HasConversion<UserIdConverter>();
 
             historyBuilder.Property(h => h.BannedByModeratorId)
                 .HasConversion<UserIdConverter>();
