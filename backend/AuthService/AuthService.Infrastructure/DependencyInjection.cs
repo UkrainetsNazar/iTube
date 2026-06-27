@@ -1,4 +1,5 @@
 using AuthService.Application.Interfaces;
+using AuthService.Infrastructure.Consumers;
 using AuthService.Infrastructure.Persistence;
 using AuthService.Infrastructure.Repositories;
 using AuthService.Infrastructure.Services;
@@ -19,10 +20,10 @@ public static class DependencyInjection
         services.AddDbContext<AuthDbContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("AuthDb")));
 
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IJwtGenerator, JwtGenerator>();
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<IUserRepository, UserRepository>();
-        services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IEmailSender, SmtpEmailSender>();
 
         services.AddMassTransit(busConfigurator =>
@@ -32,6 +33,10 @@ public static class DependencyInjection
                 outboxConfigurator.UsePostgres();
                 outboxConfigurator.UseBusOutbox();
             });
+
+            busConfigurator.AddConsumer<RoleChangedConsumer>();
+            busConfigurator.AddConsumer<UserBannedConsumer>();
+            busConfigurator.AddConsumer<UserUnbannedConsumer>();
 
             busConfigurator.UsingRabbitMq((context, cfg) =>
             {
