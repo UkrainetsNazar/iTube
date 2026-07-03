@@ -47,7 +47,11 @@ public sealed class User : AggregateRoot<UserId>
             EmailConfirmationTokenExpiresAt = DateTime.UtcNow.AddDays(7)
         };
 
-        user.RaiseDomainEvent(new UserRegisteredDomainEvent(user.Id, user.Email.Value));
+        user.RaiseDomainEvent(new UserRegisteredDomainEvent(
+            user.Id,
+            user.Email.Value,
+            user.EmailConfirmationToken!));
+
         return user;
     }
 
