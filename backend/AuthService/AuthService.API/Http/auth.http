@@ -18,7 +18,7 @@ Content-Type: application/json
 
 {
   "email": "{{email}}",
-  "token": "YOUR_CONFIRMATION_TOKEN_HERE"
+  "token": "17fecc22b5194ebf9681e2f78a32981b"
 }
 
 ### Login
