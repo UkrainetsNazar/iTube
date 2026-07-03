@@ -19,11 +19,9 @@ public sealed class UnitOfWork(UserDbContext dbContext, IPublisher publisher) : 
             })
             .ToList();
 
-        var result = await dbContext.SaveChangesAsync(ct);
-
         foreach (var domainEvent in domainEvents)
             await publisher.Publish(domainEvent, ct);
 
-        return result;
+        return await dbContext.SaveChangesAsync(ct);
     }
 }
