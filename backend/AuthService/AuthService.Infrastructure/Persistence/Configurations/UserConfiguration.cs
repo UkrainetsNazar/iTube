@@ -56,8 +56,9 @@ public sealed class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Navigation(u => u.RefreshTokens)
             .UsePropertyAccessMode(PropertyAccessMode.Field);
 
-        builder.Property(u => u.Version)
-            .IsConcurrencyToken();
+        builder.Property<uint>("xmin")
+            .HasColumnType("xid")
+            .IsRowVersion();
 
         builder.Ignore(u => u.DomainEvents);
 

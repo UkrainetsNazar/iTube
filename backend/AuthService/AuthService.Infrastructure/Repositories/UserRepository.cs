@@ -24,10 +24,14 @@ public sealed class UserRepository(AuthDbContext dbContext) : IUserRepository
             .ToListAsync(ct);
 
     public async Task<User?> GetByEmailAsync(Email email, CancellationToken ct) =>
-    await dbContext.Users.FirstOrDefaultAsync(u => u.Email == email, ct);
+        await dbContext.Users
+            .Include(u => u.RefreshTokens)
+            .FirstOrDefaultAsync(u => u.Email == email, ct);
 
     public async Task<User?> GetByIdAsync(UserId id, CancellationToken ct) =>
-        await dbContext.Users.FirstOrDefaultAsync(u => u.Id == id, ct);
+        await dbContext.Users
+            .Include(u => u.RefreshTokens)
+            .FirstOrDefaultAsync(u => u.Id == id, ct);
 
     public async Task<User?> GetByRefreshTokenAsync(string tokenHash, CancellationToken ct)
         => await dbContext.Users

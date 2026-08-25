@@ -12,6 +12,9 @@ public sealed class RefreshTokenConfiguration : IEntityTypeConfiguration<Refresh
         builder.ToTable("RefreshTokens");
         builder.HasKey(rt => rt.Id);
 
+        builder.Property(rt => rt.Id)
+            .ValueGeneratedNever();
+
         builder.Property(rt => rt.UserId)
             .HasConversion<UserIdConverter>()
             .IsRequired();

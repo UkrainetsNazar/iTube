@@ -81,8 +81,9 @@ public sealed class UserAccountConfiguration : IEntityTypeConfiguration<UserAcco
         builder.Navigation(u => u.History)
             .UsePropertyAccessMode(PropertyAccessMode.Field);
 
-        builder.Property(u => u.Version)
-            .IsConcurrencyToken();
+        builder.Property<uint>("xmin")
+            .HasColumnType("xid")
+            .IsRowVersion();
 
         builder.Ignore(u => u.DomainEvents);
     }

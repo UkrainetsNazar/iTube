@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Shared.Domain.Interfaces;
 
 namespace UserService.Infrastructure.Persistence;
@@ -22,6 +23,17 @@ public sealed class UnitOfWork(UserDbContext dbContext, IPublisher publisher) : 
         foreach (var domainEvent in domainEvents)
             await publisher.Publish(domainEvent, ct);
 
-        return await dbContext.SaveChangesAsync(ct);
+        try
+        {
+            return await dbContext.SaveChangesAsync(ct);
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            foreach (var entry in ex.Entries)
+            {
+                Console.WriteLine($"Concurrency conflict: {entry.Entity.GetType().Name}, State: {entry.State}");
+            }
+            throw;
+        }
     }
 }

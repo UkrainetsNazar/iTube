@@ -12,11 +12,11 @@ public sealed class RefreshTokenCommandHandler(
 {
     public async Task<Result<AuthResponseDto>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {
-        var tokenHash = passwordHasher.Hash(request.RefreshToken);
+        var tokenHash = passwordHasher.HashToken(request.RefreshToken);
         var user = await userRepository.GetByRefreshTokenAsync(tokenHash, cancellationToken);
 
         if (user == null)
-            return Result.Failure<AuthResponseDto>(Error.Failure("Logout.UserNotFound", "There is no user with this token"));
+            return Result.Failure<AuthResponseDto>(Error.Failure("Refresh.UserNotFound", "There is no user with this token"));
 
         var revokeResult = user.RevokeRefreshToken(tokenHash);
         if (revokeResult.IsFailure)
@@ -26,7 +26,7 @@ public sealed class RefreshTokenCommandHandler(
         var refreshTokenRaw = jwtGenerator.GenerateRefreshToken();
 
         user.IssueRefreshToken(
-            tokenHash: passwordHasher.Hash(refreshTokenRaw),
+            tokenHash: passwordHasher.HashToken(refreshTokenRaw),
             expiresAt: DateTime.UtcNow.AddDays(7));
 
         await unitOfWork.SaveChangesAsync(cancellationToken);

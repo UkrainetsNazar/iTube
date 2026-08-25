@@ -1,0 +1,66 @@
+@baseUrl = http://localhost:5002/api
+@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjdlMjY4YWNiLTUxMGQtNDMxNi1iMjhjLTBjODQ1NDQxOGJmMiIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6InRlc3R1c2VyQGV4YW1wbGUuY29tIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiVXNlciIsImV4cCI6MTc4NzY1NDE5NiwiaXNzIjoiaXR1YmUiLCJhdWQiOiJpdHViZSJ9.v3X930HI_TQk0gBB5ExfZMZPdDZwvs_dei0Sgh7hEaE
+
+### Get User
+GET {{baseUrl}}/users/7e268acb-510d-4316-b28c-0c8454418bf2
+Content-Type: application/json
+
+### Get Channel
+GET {{baseUrl}}/channels/fafe8e42-6e33-4f52-8911-520eb31ee3f0
+Content-Type: application/json
+
+### Update Channel
+PUT {{baseUrl}}/channels/fafe8e42-6e33-4f52-8911-520eb31ee3f0
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "My Awesome Channel",
+  "description": "This is my channel description",
+  "avatarBucket": null,
+  "avatarKey": null,
+  "bannerBucket": null,
+  "bannerKey": null
+}
+
+### Subscribe to Channel
+POST {{baseUrl}}/subscriptions
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "targetChannelId": "TARGET_CHANNEL_ID_HERE"
+}
+
+### Unsubscribe from Channel
+DELETE {{baseUrl}}/subscriptions
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "targetChannelId": "TARGET_CHANNEL_ID_HERE"
+}
+
+### Ban User (Moderator/Admin only)
+POST {{baseUrl}}/moderation/users/USER_ID_HERE/ban
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "reason": "Violation of community guidelines",
+  "expiresAt": "2026-08-01T00:00:00Z"
+}
+
+### Unban User (Moderator/Admin only)
+DELETE {{baseUrl}}/moderation/users/USER_ID_HERE/ban
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+### Change Role (Admin only)
+PATCH {{baseUrl}}/users/USER_ID_HERE/role
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "role": 1
+}

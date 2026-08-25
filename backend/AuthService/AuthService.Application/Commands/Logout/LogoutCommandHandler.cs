@@ -11,7 +11,7 @@ public sealed class LogoutCommandHandler(
 {
     public async Task<Result> Handle(LogoutCommand request, CancellationToken cancellationToken)
     {
-        var tokenHash = passwordHasher.Hash(request.RefreshToken);
+        var tokenHash = passwordHasher.HashToken(request.RefreshToken);
         var user = await userRepository.GetByRefreshTokenAsync(tokenHash, cancellationToken);
 
         if(user == null)

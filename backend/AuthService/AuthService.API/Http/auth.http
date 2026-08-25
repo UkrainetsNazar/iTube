@@ -12,13 +12,13 @@ Content-Type: application/json
   "password": "{{password}}"
 }
 
-### Confirm Email (замінити token на той що прийшов на пошту)
+### Confirm Email
 POST {{baseUrl}}/confirm-email
 Content-Type: application/json
 
 {
   "email": "{{email}}",
-  "token": "17fecc22b5194ebf9681e2f78a32981b"
+  "token": "423a1a5b30064c7da60ac1d55b21c5b0"
 }
 
 ### Login
@@ -31,9 +31,9 @@ Content-Type: application/json
   "password": "{{password}}"
 }
 
-### Зберегти токени з відповіді Login
+### Access Token
 @accessToken = {{login.response.body.accessToken}}
-@refreshToken = {{login.response.body.refreshToken}}
+
 
 ### Refresh Token
 # @name refresh
@@ -41,18 +41,28 @@ POST {{baseUrl}}/refresh
 Content-Type: application/json
 
 {
-  "refreshToken": "{{refreshToken}}"
+  "refreshToken": "{{login.response.body.refreshToken}}"
 }
 
-### Logout
+
+### 1. Logout (Without refresh)
 POST {{baseUrl}}/logout
 Content-Type: application/json
 
 {
-  "refreshToken": "{{refreshToken}}"
+  "refreshToken": "{{login.response.body.refreshToken}}"
 }
 
-### Change Password (потребує JWT)
+
+### 2. Logout (After refresh)
+POST {{baseUrl}}/logout
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refresh.response.body.refreshToken}}"
+}
+
+### Change Password
 POST {{baseUrl}}/change-password
 Content-Type: application/json
 Authorization: Bearer {{accessToken}}
@@ -70,7 +80,7 @@ Content-Type: application/json
   "email": "{{email}}"
 }
 
-### Reset Password (замінити token на той що прийшов на пошту)
+### Reset Password
 POST {{baseUrl}}/reset-password
 Content-Type: application/json
 

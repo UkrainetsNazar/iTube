@@ -40,7 +40,7 @@ public sealed class LoginCommandHandler(
         var refreshTokenRaw = jwtGenerator.GenerateRefreshToken();
 
         user.IssueRefreshToken(
-            tokenHash: passwordHasher.Hash(refreshTokenRaw),
+            tokenHash: passwordHasher.HashToken(refreshTokenRaw),
             expiresAt: DateTime.UtcNow.AddDays(7));
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
