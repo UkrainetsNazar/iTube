@@ -1,16 +1,16 @@
 @baseUrl = http://localhost:5002/api
-@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjdlMjY4YWNiLTUxMGQtNDMxNi1iMjhjLTBjODQ1NDQxOGJmMiIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6InRlc3R1c2VyQGV4YW1wbGUuY29tIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiVXNlciIsImV4cCI6MTc4NzY1NDE5NiwiaXNzIjoiaXR1YmUiLCJhdWQiOiJpdHViZSJ9.v3X930HI_TQk0gBB5ExfZMZPdDZwvs_dei0Sgh7hEaE
+@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6ImE4YzcwYzcyLWJkYTItNDlmYy05ZDhkLTFmMWVkODNmZTNlMSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6InRlc3R1c2VyQGV4YW1wbGUuY29tIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiVXNlciIsImV4cCI6MTc4NzY1ODUzOCwiaXNzIjoiaXR1YmUiLCJhdWQiOiJpdHViZSJ9.IyKrrcrW-vmDdVdeYnpwBF2mH9mhrpfEYCh1rcHY8lk
 
 ### Get User
-GET {{baseUrl}}/users/7e268acb-510d-4316-b28c-0c8454418bf2
+GET {{baseUrl}}/users/a8c70c72-bda2-49fc-9d8d-1f1ed83fe3e1
 Content-Type: application/json
 
 ### Get Channel
-GET {{baseUrl}}/channels/fafe8e42-6e33-4f52-8911-520eb31ee3f0
+GET {{baseUrl}}/channels/a8c70c72-bda2-49fc-9d8d-1f1ed83fe3e1
 Content-Type: application/json
 
 ### Update Channel
-PUT {{baseUrl}}/channels/fafe8e42-6e33-4f52-8911-520eb31ee3f0
+PUT {{baseUrl}}/channels/a8c70c72-bda2-49fc-9d8d-1f1ed83fe3e1
 Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 
@@ -29,7 +29,7 @@ Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 
 {
-  "targetChannelId": "TARGET_CHANNEL_ID_HERE"
+  "targetChannelId": "a8c70c72-bda2-49fc-9d8d-1f1ed83fe3e1"
 }
 
 ### Unsubscribe from Channel
@@ -38,7 +38,7 @@ Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 
 {
-  "targetChannelId": "TARGET_CHANNEL_ID_HERE"
+  "targetChannelId": "a8c70c72-bda2-49fc-9d8d-1f1ed83fe3e1"
 }
 
 ### Ban User (Moderator/Admin only)
@@ -52,12 +52,12 @@ Authorization: Bearer {{accessToken}}
 }
 
 ### Unban User (Moderator/Admin only)
-DELETE {{baseUrl}}/moderation/users/USER_ID_HERE/ban
+DELETE {{baseUrl}}/moderation/users/a8c70c72-bda2-49fc-9d8d-1f1ed83fe3e1/ban
 Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 
 ### Change Role (Admin only)
-PATCH {{baseUrl}}/users/USER_ID_HERE/role
+PATCH {{baseUrl}}/users/a8c70c72-bda2-49fc-9d8d-1f1ed83fe3e1/role
 Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 

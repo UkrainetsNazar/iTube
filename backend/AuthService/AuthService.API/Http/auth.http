@@ -18,7 +18,7 @@ Content-Type: application/json
 
 {
   "email": "{{email}}",
-  "token": "423a1a5b30064c7da60ac1d55b21c5b0"
+  "token": "61b8767d3c5647bc97aacc2c47683189"
 }
 
 ### Login
@@ -86,6 +86,6 @@ Content-Type: application/json
 
 {
   "email": "{{email}}",
-  "token": "YOUR_RESET_TOKEN_HERE",
+  "token": "b39b3550d29c41fdb13bdf768a5be72e",
   "newPassword": "{{newPassword}}"
 }
