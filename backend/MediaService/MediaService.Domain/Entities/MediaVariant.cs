@@ -1,4 +1,4 @@
-using MediaService.Domain.Enums;
+using Shared.Domain.Enums;
 
 namespace MediaService.Domain.Entities;
 

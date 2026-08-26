@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using MediaService.Application.Interfaces;
-using MediaService.Domain.Enums;
 using Microsoft.Extensions.Logging;
+using Shared.Domain.Enums;
 
 namespace MediaService.Infrastructure.Services;
 

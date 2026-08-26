@@ -6,7 +6,6 @@ using MediaService.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Minio;
 using Shared.Domain.Interfaces;
 
