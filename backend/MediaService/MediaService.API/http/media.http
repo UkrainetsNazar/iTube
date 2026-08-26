@@ -1,0 +1,42 @@
+@baseUrl = http://localhost:5003/api
+@accessToken = PASTE_FRESH_TOKEN_HERE
+
+### Upload raw video (multipart)
+POST {{baseUrl}}/media/upload
+Content-Type: multipart/form-data; boundary=----boundary
+Authorization: Bearer {{accessToken}}
+
+------boundary
+Content-Disposition: form-data; name="mediaType"
+
+RawVideo
+------boundary
+Content-Disposition: form-data; name="videoId"
+
+00000000-0000-0000-0000-000000000000
+------boundary
+Content-Disposition: form-data; name="file"; filename="sample.mp4"
+Content-Type: video/mp4
+
+< ./sample-files/sample.mp4
+------boundary--
+
+### Upload channel avatar
+POST {{baseUrl}}/media/upload
+Content-Type: multipart/form-data; boundary=----boundary
+Authorization: Bearer {{accessToken}}
+
+------boundary
+Content-Disposition: form-data; name="mediaType"
+
+Avatar
+------boundary
+Content-Disposition: form-data; name="channelId"
+
+00000000-0000-0000-0000-000000000000
+------boundary
+Content-Disposition: form-data; name="file"; filename="avatar.png"
+Content-Type: image/png
+
+< ./sample-files/avatar.png
+------boundary--
