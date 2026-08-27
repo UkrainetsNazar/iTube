@@ -1,3 +1,4 @@
+using MassTransit;
 using MediaService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,5 +9,11 @@ public sealed class MediaDbContext(DbContextOptions<MediaDbContext> options) : D
     public DbSet<MediaAsset> MediaAssets => Set<MediaAsset>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
-        => modelBuilder.ApplyConfigurationsFromAssembly(typeof(MediaDbContext).Assembly);
+    {
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(MediaDbContext).Assembly);
+        modelBuilder.AddInboxStateEntity();
+        modelBuilder.AddOutboxMessageEntity();
+        modelBuilder.AddOutboxStateEntity();
+        base.OnModelCreating(modelBuilder);
+    }
 }

@@ -1,3 +1,4 @@
+using MassTransit;
 using MediaService.Application.Interfaces;
 using MediaService.Infrastructure.Persistence;
 using MediaService.Infrastructure.Processing;
@@ -25,6 +26,19 @@ public static class DependencyInjection
             .WithCredentials(configuration["Minio:AccessKey"], configuration["Minio:SecretKey"])
             .WithSSL(bool.Parse(configuration["Minio:UseSsl"] ?? "false"))
             .Build());
+
+        services.AddMassTransit(x =>
+        {
+            x.UsingRabbitMq((context, cfg) =>
+            {
+                var rabbitMqHost = configuration["RabbitMQ:Host"] ?? "localhost";
+                cfg.Host(rabbitMqHost, "/", h =>
+                {
+                    h.Username(configuration["RabbitMQ:Username"] ?? "guest");
+                    h.Password(configuration["RabbitMQ:Password"] ?? "guest");
+                });
+            });
+        });
 
         services.AddScoped<IVideoStorageService, MinioStorageService>();
         services.AddScoped<IVideoProcessor, FfmpegVideoProcessor>();
