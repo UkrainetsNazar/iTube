@@ -64,3 +64,8 @@ Authorization: Bearer {{accessToken}}
 {
   "role": 1
 }
+
+### Get My Subscriptions
+GET {{baseUrl}}/users/a8c70c72-bda2-49fc-9d8d-1f1ed83fe3e1/subscriptions
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}

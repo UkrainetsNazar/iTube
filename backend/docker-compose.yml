@@ -1,5 +1,22 @@
 services:
 
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.0
+    container_name: itube-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+
   auth-db:
     image: postgres:16-alpine
     container_name: itube-auth-db
@@ -51,6 +68,23 @@ services:
       timeout: 5s
       retries: 5
 
+  video-db:
+    image: postgres:16-alpine
+    container_name: itube-video-db
+    environment:
+      POSTGRES_DB: video_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5435:5432"
+    volumes:
+      - video-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   rabbitmq:
     image: rabbitmq:3.13-management-alpine
     container_name: itube-rabbitmq
@@ -64,6 +98,19 @@ services:
       - rabbitmq-data:/var/lib/rabbitmq
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: itube-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -158,9 +205,40 @@ services:
       minio:
         condition: service_healthy
 
+  video-service:
+    build:
+      context: .
+      dockerfile: VideoService/VideoService.API/Dockerfile
+    container_name: itube-video-service
+    ports:
+      - "5004:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__VideoDb=Host=video-db;Port=5432;Database=video_db;Username=postgres;Password=postgres
+      - Jwt__Secret=super-secret-key-minimum-32-characters-long
+      - Jwt__Issuer=itube
+      - Jwt__Audience=itube
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Username=guest
+      - RabbitMQ__Password=guest
+      - Redis__ConnectionString=redis:6379
+      - Elasticsearch__Uri=http://elasticsearch:9200
+    depends_on:
+      video-db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+
 volumes:
   auth-db-data:
   user-db-data:
   media-db-data:
+  video-db-data:
   rabbitmq-data:
+  redis-data:
   minio-data:
+  elasticsearch-data:
