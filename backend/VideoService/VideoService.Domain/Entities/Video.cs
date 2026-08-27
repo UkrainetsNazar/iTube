@@ -71,6 +71,7 @@ public sealed class Video : AggregateRoot<VideoId>
             return Result.Failure(Error.Conflict("Video.AlreadyDeleted", "Video is already deleted."));
 
         Status = VideoStatus.Deleted;
+        RaiseDomainEvent(new VideoDeletedDomainEvent(Id));
         return Result.Success();
     }
 
