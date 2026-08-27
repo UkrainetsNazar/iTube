@@ -1,0 +1,86 @@
+@baseUrl = http://localhost:5004/api
+@accessToken = PASTE_FRESH_TOKEN_HERE
+
+### Get videos by channel
+GET {{baseUrl}}/channels/00000000-0000-0000-0000-000000000000/videos?page=1&pageSize=20
+
+### Get subscriptions feed (requires the caller to actually be subscribed to something in UserService)
+GET {{baseUrl}}/videos/subscriptions?page=1&pageSize=20
+Authorization: Bearer {{accessToken}}
+
+### Upload video (creates Draft record — call BEFORE uploading raw file to MediaService)
+POST {{baseUrl}}/videos/upload
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "title": "My First Video",
+  "description": "A short description of the video.",
+  "tags": ["tech", "tutorial", "dotnet"]
+}
+
+### Get video by id
+GET {{baseUrl}}/videos/00000000-0000-0000-0000-000000000000
+
+### Publish video (requires at least one VideoSource — i.e. MediaService must have finished processing first)
+PATCH {{baseUrl}}/videos/00000000-0000-0000-0000-000000000000/publish
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "visibility": "Public"
+}
+
+### Get video feed
+GET {{baseUrl}}/videos/feed?page=1&pageSize=20
+
+### Delete video
+DELETE {{baseUrl}}/videos/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{accessToken}}
+
+### React to video (like)
+POST {{baseUrl}}/videos/00000000-0000-0000-0000-000000000000/react
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "type": "Like"
+}
+
+### React to video (dislike)
+POST {{baseUrl}}/videos/00000000-0000-0000-0000-000000000000/react
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "type": "Dislike"
+}
+
+### Add comment
+POST {{baseUrl}}/videos/00000000-0000-0000-0000-000000000000/comments
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "text": "Great video!"
+}
+
+### Delete comment
+DELETE {{baseUrl}}/comments/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{accessToken}}
+
+### Recommendations — contextual (related to a specific video)
+GET {{baseUrl}}/recommendations?videoId=00000000-0000-0000-0000-000000000000&limit=10
+
+### Recommendations — personalized (based on caller's like history)
+GET {{baseUrl}}/recommendations?limit=10
+Authorization: Bearer {{accessToken}}
+
+### Recommendations — anonymous fallback (popular videos)
+GET {{baseUrl}}/recommendations?limit=10
+
+### Search — full text
+GET {{baseUrl}}/videos/search?q=tutorial&page=1&pageSize=20
+
+### Search — with tag filter (comma-separated; note: tag filtering not yet wired in query DSL, see earlier flag)
+GET {{baseUrl}}/videos/search?q=dotnet&tags=tech,tutorial&page=1&pageSize=20

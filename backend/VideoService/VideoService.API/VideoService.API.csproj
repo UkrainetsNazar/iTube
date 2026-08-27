@@ -14,6 +14,10 @@
   <ItemGroup>
     <ProjectReference Include="..\VideoService.Application\VideoService.Application.csproj" />
     <ProjectReference Include="..\VideoService.Infrastructure\VideoService.Infrastructure.csproj" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.11">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
 
 </Project>

@@ -1,6 +1,0 @@
-@VideoService.API_HostAddress = http://localhost:5261
-
-GET {{VideoService.API_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
