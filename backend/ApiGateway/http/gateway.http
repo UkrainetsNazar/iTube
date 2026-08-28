@@ -1,0 +1,36 @@
+@baseUrl = http://localhost:5010/api
+@accessToken = PASTE_FRESH_TOKEN_HERE
+
+### Through gateway: register (rate-limited — 5/min)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "gatewaytest@example.com",
+  "password": "Test1234!"
+}
+
+### Through gateway: login (rate-limited — 5/min)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "gatewaytest@example.com",
+  "password": "Test1234!"
+}
+
+### Through gateway: get video feed (proxied to VideoService)
+GET {{baseUrl}}/videos/feed?page=1&pageSize=20
+
+### Through gateway: get user (proxied to UserService)
+GET {{baseUrl}}/users/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{accessToken}}
+
+### Rate-limit test: hit login 6 times rapidly — 6th should return 429
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "gatewaytest@example.com",
+  "password": "wrongpassword"
+}

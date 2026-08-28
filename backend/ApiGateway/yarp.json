@@ -1,0 +1,71 @@
+{
+  "ReverseProxy": {
+    "Routes": {
+      "auth-login-route": {
+        "ClusterId": "auth-cluster",
+        "RateLimiterPolicy": "AuthPolicy",
+        "Match": { "Path": "/api/auth/login" }
+      },
+      "auth-register-route": {
+        "ClusterId": "auth-cluster",
+        "RateLimiterPolicy": "AuthPolicy",
+        "Match": { "Path": "/api/auth/register" }
+      },
+      "auth-catchall-route": {
+        "ClusterId": "auth-cluster",
+        "Match": { "Path": "/api/auth/{**catch-all}" }
+      },
+      "media-upload-route": {
+        "ClusterId": "media-cluster",
+        "RateLimiterPolicy": "UploadPolicy",
+        "Match": { "Path": "/api/media/upload" }
+      },
+      "media-catchall-route": {
+        "ClusterId": "media-cluster",
+        "Match": { "Path": "/api/media/{**catch-all}" }
+      },
+      "user-users-route": {
+        "ClusterId": "user-cluster",
+        "Match": { "Path": "/api/users/{**catch-all}" }
+      },
+      "user-channels-route": {
+        "ClusterId": "user-cluster",
+        "Match": { "Path": "/api/channels/{**catch-all}" }
+      },
+      "user-subscriptions-route": {
+        "ClusterId": "user-cluster",
+        "Match": { "Path": "/api/subscriptions/{**catch-all}" }
+      },
+      "user-moderation-route": {
+        "ClusterId": "user-cluster",
+        "Match": { "Path": "/api/moderation/{**catch-all}" }
+      },
+      "video-videos-route": {
+        "ClusterId": "video-cluster",
+        "Match": { "Path": "/api/videos/{**catch-all}" }
+      },
+      "video-comments-route": {
+        "ClusterId": "video-cluster",
+        "Match": { "Path": "/api/comments/{**catch-all}" }
+      },
+      "video-recommendations-route": {
+        "ClusterId": "video-cluster",
+        "Match": { "Path": "/api/recommendations/{**catch-all}" }
+      }
+    },
+    "Clusters": {
+      "auth-cluster": {
+        "Destinations": { "d1": { "Address": "http://auth-service:8080" } }
+      },
+      "user-cluster": {
+        "Destinations": { "d1": { "Address": "http://user-service:8080" } }
+      },
+      "media-cluster": {
+        "Destinations": { "d1": { "Address": "http://media-service:8080" } }
+      },
+      "video-cluster": {
+        "Destinations": { "d1": { "Address": "http://video-service:8080" } }
+      }
+    }
+  }
+}
