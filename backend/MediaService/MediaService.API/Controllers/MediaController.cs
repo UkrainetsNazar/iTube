@@ -3,7 +3,7 @@ using MediaService.API.Requests;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MediaService.API.Extensions;
+using Shared.Api.Extensions;
 
 namespace MediaService.API.Controllers;
 

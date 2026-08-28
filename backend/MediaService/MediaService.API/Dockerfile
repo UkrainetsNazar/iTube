@@ -15,6 +15,7 @@ COPY ["MediaService/MediaService.Domain/MediaService.Domain.csproj", "MediaServi
 COPY ["MediaService/MediaService.Infrastructure/MediaService.Infrastructure.csproj", "MediaService/MediaService.Infrastructure/"]
 COPY ["Shared.Domain/Shared.Domain.csproj", "Shared.Domain/"]
 COPY ["Shared.Infrastructure/Shared.Infrastructure.csproj", "Shared.Infrastructure/"]
+COPY ["Shared.API/Shared.API.csproj", "Shared.API/"]
 
 RUN dotnet restore "MediaService/MediaService.API/MediaService.API.csproj"
 
