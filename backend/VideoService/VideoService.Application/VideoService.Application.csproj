@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\VideoService.Domain\VideoService.Domain.csproj" />
+    <ProjectReference Include="..\..\Shared.Application\Shared.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>
