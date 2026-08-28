@@ -6,9 +6,9 @@ services:
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - ES_JAVA_OPTS=${ELASTIC_JAVA_OPTS}
     ports:
-      - "9200:9200"
+      - "${ELASTICSEARCH_PORT}:9200"
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
     healthcheck:
@@ -21,15 +21,15 @@ services:
     image: postgres:16-alpine
     container_name: itube-auth-db
     environment:
-      POSTGRES_DB: auth_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${AUTH_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "5432:5432"
+      - "${AUTH_DB_PORT}:5432"
     volumes:
       - auth-db-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -38,15 +38,15 @@ services:
     image: postgres:16-alpine
     container_name: itube-user-db
     environment:
-      POSTGRES_DB: user_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${USER_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "5433:5432"
+      - "${USER_DB_PORT}:5432"
     volumes:
       - user-db-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -55,15 +55,15 @@ services:
     image: postgres:16-alpine
     container_name: itube-media-db
     environment:
-      POSTGRES_DB: media_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${MEDIA_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "5434:5432"
+      - "${MEDIA_DB_PORT}:5432"
     volumes:
       - media-db-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -72,15 +72,15 @@ services:
     image: postgres:16-alpine
     container_name: itube-video-db
     environment:
-      POSTGRES_DB: video_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${VIDEO_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "5435:5432"
+      - "${VIDEO_DB_PORT}:5432"
     volumes:
       - video-db-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -89,11 +89,11 @@ services:
     image: rabbitmq:3.13-management-alpine
     container_name: itube-rabbitmq
     environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "${RABBITMQ_PORT}:5672"
+      - "${RABBITMQ_MANAGEMENT_PORT}:15672"
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq
     healthcheck:
@@ -106,7 +106,7 @@ services:
     image: redis:7-alpine
     container_name: itube-redis
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT}:6379"
     volumes:
       - redis-data:/data
     healthcheck:
@@ -120,11 +120,11 @@ services:
     container_name: itube-minio
     command: server /data --console-address ":9001"
     environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "${MINIO_API_PORT}:9000"
+      - "${MINIO_CONSOLE_PORT}:9001"
     volumes:
       - minio-data:/data
     healthcheck:
@@ -135,20 +135,25 @@ services:
 
   auth-service:
     build:
-      context: .
+      context: ./backend
       dockerfile: AuthService/AuthService.API/Dockerfile
     container_name: itube-auth-service
     ports:
-      - "5001:8080"
+      - "${AUTH_SERVICE_PORT}:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__AuthDb=Host=auth-db;Port=5432;Database=auth_db;Username=postgres;Password=postgres
-      - Jwt__Secret=super-secret-key-minimum-32-characters-long
-      - Jwt__Issuer=itube
-      - Jwt__Audience=itube
+      - ConnectionStrings__AuthDb=Host=auth-db;Port=5432;Database=${AUTH_DB_NAME};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - Jwt__Secret=${JWT_SECRET}
+      - Jwt__Issuer=${JWT_ISSUER}
+      - Jwt__Audience=${JWT_AUDIENCE}
       - RabbitMQ__Host=rabbitmq
-      - RabbitMQ__Username=guest
-      - RabbitMQ__Password=guest
+      - RabbitMQ__Username=${RABBITMQ_USER}
+      - RabbitMQ__Password=${RABBITMQ_PASSWORD}
+      - Smtp__Host=${SMTP_HOST}
+      - Smtp__Port=${SMTP_PORT}
+      - Smtp__User=${SMTP_USER}
+      - Smtp__Pass=${SMTP_PASS}
+      - Smtp__From=${SMTP_FROM}
     depends_on:
       auth-db:
         condition: service_healthy
@@ -157,20 +162,20 @@ services:
 
   user-service:
     build:
-      context: .
+      context: ./backend
       dockerfile: UserService/UserService.API/Dockerfile
     container_name: itube-user-service
     ports:
-      - "5002:8080"
+      - "${USER_SERVICE_PORT}:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__UserDb=Host=user-db;Port=5432;Database=user_db;Username=postgres;Password=postgres
-      - Jwt__Secret=super-secret-key-minimum-32-characters-long
-      - Jwt__Issuer=itube
-      - Jwt__Audience=itube
+      - ConnectionStrings__UserDb=Host=user-db;Port=5432;Database=${USER_DB_NAME};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - Jwt__Secret=${JWT_SECRET}
+      - Jwt__Issuer=${JWT_ISSUER}
+      - Jwt__Audience=${JWT_AUDIENCE}
       - RabbitMQ__Host=rabbitmq
-      - RabbitMQ__Username=guest
-      - RabbitMQ__Password=guest
+      - RabbitMQ__Username=${RABBITMQ_USER}
+      - RabbitMQ__Password=${RABBITMQ_PASSWORD}
     depends_on:
       user-db:
         condition: service_healthy
@@ -179,23 +184,23 @@ services:
 
   media-service:
     build:
-      context: .
+      context: ./backend
       dockerfile: MediaService/MediaService.API/Dockerfile
     container_name: itube-media-service
     ports:
-      - "5003:8080"
+      - "${MEDIA_SERVICE_PORT}:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__MediaDb=Host=media-db;Port=5432;Database=media_db;Username=postgres;Password=postgres
-      - Jwt__Secret=super-secret-key-minimum-32-characters-long
-      - Jwt__Issuer=itube
-      - Jwt__Audience=itube
+      - ConnectionStrings__MediaDb=Host=media-db;Port=5432;Database=${MEDIA_DB_NAME};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - Jwt__Secret=${JWT_SECRET}
+      - Jwt__Issuer=${JWT_ISSUER}
+      - Jwt__Audience=${JWT_AUDIENCE}
       - RabbitMQ__Host=rabbitmq
-      - RabbitMQ__Username=guest
-      - RabbitMQ__Password=guest
+      - RabbitMQ__Username=${RABBITMQ_USER}
+      - RabbitMQ__Password=${RABBITMQ_PASSWORD}
       - Minio__Endpoint=minio:9000
-      - Minio__AccessKey=minioadmin
-      - Minio__SecretKey=minioadmin
+      - Minio__AccessKey=${MINIO_ROOT_USER}
+      - Minio__SecretKey=${MINIO_ROOT_PASSWORD}
       - Minio__UseSsl=false
     depends_on:
       media-db:
@@ -207,20 +212,20 @@ services:
 
   video-service:
     build:
-      context: .
+      context: ./backend
       dockerfile: VideoService/VideoService.API/Dockerfile
     container_name: itube-video-service
     ports:
-      - "5004:8080"
+      - "${VIDEO_SERVICE_PORT}:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__VideoDb=Host=video-db;Port=5432;Database=video_db;Username=postgres;Password=postgres
-      - Jwt__Secret=super-secret-key-minimum-32-characters-long
-      - Jwt__Issuer=itube
-      - Jwt__Audience=itube
+      - ConnectionStrings__VideoDb=Host=video-db;Port=5432;Database=${VIDEO_DB_NAME};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - Jwt__Secret=${JWT_SECRET}
+      - Jwt__Issuer=${JWT_ISSUER}
+      - Jwt__Audience=${JWT_AUDIENCE}
       - RabbitMQ__Host=rabbitmq
-      - RabbitMQ__Username=guest
-      - RabbitMQ__Password=guest
+      - RabbitMQ__Username=${RABBITMQ_USER}
+      - RabbitMQ__Password=${RABBITMQ_PASSWORD}
       - Redis__ConnectionString=redis:6379
       - Elasticsearch__Uri=http://elasticsearch:9200
     depends_on:
@@ -232,6 +237,24 @@ services:
         condition: service_healthy
       elasticsearch:
         condition: service_healthy
+
+  api-gateway:
+    build:
+      context: ./backend
+      dockerfile: ApiGateway/Dockerfile
+    container_name: itube-api-gateway
+    ports:
+      - "${API_GATEWAY_PORT}:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - Jwt__Secret=${JWT_SECRET}
+      - Jwt__Issuer=${JWT_ISSUER}
+      - Jwt__Audience=${JWT_AUDIENCE}
+    depends_on:
+      - auth-service
+      - user-service
+      - media-service
+      - video-service
 
 volumes:
   auth-db-data:
