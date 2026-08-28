@@ -1,4 +1,4 @@
-using AuthService.API.Extensions;
+using Shared.Api.Extensions;
 using AuthService.Application.Commands.ChangePassword;
 using AuthService.Application.Commands.ConfirmEmail;
 using AuthService.Application.Commands.ForgotPassword;

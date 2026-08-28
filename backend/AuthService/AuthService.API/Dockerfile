@@ -11,6 +11,7 @@ COPY ["AuthService/AuthService.Domain/AuthService.Domain.csproj", "AuthService/A
 COPY ["AuthService/AuthService.Infrastructure/AuthService.Infrastructure.csproj", "AuthService/AuthService.Infrastructure/"]
 COPY ["Shared.Domain/Shared.Domain.csproj", "Shared.Domain/"]
 COPY ["Shared.Infrastructure/Shared.Infrastructure.csproj", "Shared.Infrastructure/"]
+COPY ["Shared.API/Shared.API.csproj", "Shared.API/"]
 
 RUN dotnet restore "AuthService/AuthService.API/AuthService.API.csproj"
 
