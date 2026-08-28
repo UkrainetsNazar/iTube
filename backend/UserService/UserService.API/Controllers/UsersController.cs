@@ -1,7 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using UserService.API.Extensions;
+using Shared.Api.Extensions;
 using UserService.API.Requests;
 using UserService.Application.Commands.ChangeRole;
 using UserService.Application.Queries.GetUser;
