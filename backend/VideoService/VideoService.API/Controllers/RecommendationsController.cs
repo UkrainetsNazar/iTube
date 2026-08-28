@@ -1,7 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Domain.ValueObjects;
-using VideoService.API.Extensions;
+using Shared.Api.Extensions;
 using VideoService.Application.Queries.GetRecommendations;
 
 namespace VideoService.API.Controllers;

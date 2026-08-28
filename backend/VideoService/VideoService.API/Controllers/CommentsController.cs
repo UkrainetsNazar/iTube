@@ -2,7 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Domain.ValueObjects;
-using VideoService.API.Extensions;
+using Shared.Api.Extensions;
 using VideoService.API.Requests;
 using VideoService.Application.Commands.AddComment;
 using VideoService.Application.Commands.DeleteComment;

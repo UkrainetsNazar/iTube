@@ -1,6 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using VideoService.API.Extensions;
+using Shared.Api.Extensions;
 using VideoService.Application.Queries.SearchVideos;
 
 namespace VideoService.API.Controllers;
