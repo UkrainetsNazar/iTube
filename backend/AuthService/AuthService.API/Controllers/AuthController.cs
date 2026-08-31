@@ -1,4 +1,3 @@
-using Shared.Api.Extensions;
 using AuthService.Application.Commands.ChangePassword;
 using AuthService.Application.Commands.ConfirmEmail;
 using AuthService.Application.Commands.ForgotPassword;
@@ -8,9 +7,11 @@ using AuthService.Application.Commands.RefreshToken;
 using AuthService.Application.Commands.Register;
 using AuthService.Application.Commands.ResetPassword;
 using AuthService.Application.DTOs;
+using AuthService.Application.Queries.GetUserByEmail;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Api.Extensions;
 
 namespace AuthService.API.Controllers;
 
@@ -18,6 +19,14 @@ namespace AuthService.API.Controllers;
 [Route("api/auth")]
 public sealed class AuthController(ISender sender) : ControllerBase
 {
+    [Authorize(Roles = "Admin")]
+    [HttpGet("users/by-email")]
+    public async Task<IActionResult> GetUserByEmail([FromQuery] string email, CancellationToken ct)
+    {
+        var result = await sender.Send(new GetUserByEmailQuery(email), ct);
+        return result.ToActionResult();
+    }
+
     [HttpPost("register")]
     public async Task<IActionResult> Register(
         [FromBody] AuthDto dto,
