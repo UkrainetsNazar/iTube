@@ -24,9 +24,17 @@
         "ClusterId": "media-cluster",
         "Match": { "Path": "/api/media/{**catch-all}" }
       },
+      "video-my-videos-route": {
+        "ClusterId": "video-cluster",
+        "Match": { "Path": "/api/users/me/videos" }
+      },
       "user-users-route": {
         "ClusterId": "user-cluster",
         "Match": { "Path": "/api/users/{**catch-all}" }
+      },
+      "video-channel-videos-route": {
+        "ClusterId": "video-cluster",
+        "Match": { "Path": "/api/channels/{channelId}/videos" }
       },
       "user-channels-route": {
         "ClusterId": "user-cluster",
