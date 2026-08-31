@@ -93,4 +93,16 @@ public sealed class Video : AggregateRoot<VideoId>
         LikesCount = Math.Max(0, LikesCount + likesDelta);
         DislikesCount = Math.Max(0, DislikesCount + dislikesDelta);
     }
+
+    public Result ChangeVisibility(VideoVisibility visibility)
+    {
+        if (Status != VideoStatus.Published)
+            return Result.Failure(Error.Conflict("Video.NotPublished", "Only published videos can have their visibility changed."));
+
+        if (Visibility == visibility)
+            return Result.Success();
+
+        Visibility = visibility;
+        return Result.Success();
+    }
 }

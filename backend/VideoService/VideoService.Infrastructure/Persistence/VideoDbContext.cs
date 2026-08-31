@@ -10,6 +10,7 @@ public sealed class VideoDbContext(DbContextOptions<VideoDbContext> options) : D
     public DbSet<Comment> Comments => Set<Comment>();
     public DbSet<VideoReaction> VideoReactions => Set<VideoReaction>();
     public DbSet<UserSubscription> UserSubscriptions => Set<UserSubscription>();
+    public DbSet<WatchHistoryEntry> WatchHistory => Set<WatchHistoryEntry>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

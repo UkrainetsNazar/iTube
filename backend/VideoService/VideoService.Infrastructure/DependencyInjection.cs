@@ -36,6 +36,7 @@ public static class DependencyInjection
         services.AddScoped<IRecommendationFeedRepository, RecommendationFeedRepository>();
         services.AddScoped<IVideoSearchIndex, ElasticVideoSearchIndex>();
         services.AddScoped<IUserSubscriptionRepository, UserSubscriptionRepository>();
+        services.AddScoped<IWatchHistoryRepository, WatchHistoryRepository>();
 
         services.AddSingleton<IConnectionMultiplexer>(_ =>
             ConnectionMultiplexer.Connect(configuration["Redis:ConnectionString"]!));

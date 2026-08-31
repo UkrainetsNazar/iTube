@@ -11,4 +11,6 @@ public interface IVideoRepository
 
     Task<IReadOnlyList<Video>> GetByChannelAsync(Guid channelId, int page, int pageSize, CancellationToken ct);
     Task<IReadOnlyList<Video>> GetByChannelsAsync(IReadOnlyList<Guid> channelIds, int page, int pageSize, CancellationToken ct);
+    Task<IReadOnlyList<Video>> GetByIdsAsync(IReadOnlyList<VideoId> ids, CancellationToken ct);
+    Task<(IReadOnlyList<Video> Items, int TotalCount)> GetAllByAuthorAsync(Guid authorId, int page, int pageSize, CancellationToken ct);
 }

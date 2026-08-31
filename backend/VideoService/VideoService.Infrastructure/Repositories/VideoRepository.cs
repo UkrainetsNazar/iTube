@@ -30,4 +30,19 @@ public sealed class VideoRepository(VideoDbContext context) : IVideoRepository
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(ct);
+
+    public async Task<IReadOnlyList<Video>> GetByIdsAsync(IReadOnlyList<VideoId> ids, CancellationToken ct)
+    => await context.Videos.Where(v => ids.Contains(v.Id)).ToListAsync(ct);
+
+    public async Task<(IReadOnlyList<Video>, int)> GetAllByAuthorAsync(Guid authorId, int page, int pageSize, CancellationToken ct)
+    {
+        var query = context.Videos.Where(v => v.AuthorId == authorId);
+        var total = await query.CountAsync(ct);
+        var items = await query
+            .OrderByDescending(v => v.CreatedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(ct);
+        return (items, total);
+    }
 }
