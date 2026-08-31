@@ -19,6 +19,17 @@ namespace AuthService.API.Controllers;
 [Route("api/auth")]
 public sealed class AuthController(ISender sender) : ControllerBase
 {
+    [Authorize]
+    [HttpGet("me")]
+    public IActionResult Me()
+    {
+        var id = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        var email = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+        var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+
+        return Ok(new { id, email, role });
+    }
+    
     [Authorize(Roles = "Admin")]
     [HttpGet("users/by-email")]
     public async Task<IActionResult> GetUserByEmail([FromQuery] string email, CancellationToken ct)
