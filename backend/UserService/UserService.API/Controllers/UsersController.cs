@@ -5,6 +5,7 @@ using Shared.Api.Extensions;
 using UserService.API.Requests;
 using UserService.Application.Commands.ChangeRole;
 using UserService.Application.Queries.GetUser;
+using UserService.Application.Queries.GetUsersForAdmin;
 
 namespace UserService.API.Controllers;
 
@@ -12,6 +13,18 @@ namespace UserService.API.Controllers;
 [Route("api/users")]
 public sealed class UsersController(ISender sender) : ControllerBase
 {
+    [Authorize(Roles = "Admin, Moderator")]
+    [HttpGet("users")]
+    public async Task<IActionResult> GetUsers(
+        [FromQuery] string? channelName,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20,
+        CancellationToken ct = default)
+    {
+        var result = await sender.Send(new GetUsersForAdminQuery(channelName, page, pageSize), ct);
+        return result.ToActionResult();
+    }
+    
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetUser(Guid id, CancellationToken ct)
     {
