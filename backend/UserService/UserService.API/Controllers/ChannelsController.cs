@@ -20,7 +20,7 @@ public sealed class ChannelsController(ISender sender) : ControllerBase
     }
 
     [Authorize]
-    [HttpPut("{id:guid}")]
+    [HttpPatch("{id:guid}")]
     public async Task<IActionResult> UpdateChannel(
         Guid id,
         [FromBody] UpdateChannelRequest request,
