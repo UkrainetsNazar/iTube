@@ -1,8 +1,3 @@
 namespace VideoService.Domain.Enums;
 
-public enum VideoStatus 
-{ 
-    Draft, 
-    Published, 
-    Deleted 
-}
+public enum VideoStatus { Draft, Published }

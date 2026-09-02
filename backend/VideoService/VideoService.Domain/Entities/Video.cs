@@ -51,9 +51,6 @@ public sealed class Video : AggregateRoot<VideoId>
 
     public Result Publish(VideoVisibility visibility)
     {
-        if (Status == VideoStatus.Deleted)
-            return Result.Failure(Error.Conflict("Video.Deleted", "Cannot publish a deleted video."));
-
         if (_sources.Count == 0)
             return Result.Failure(Error.Conflict("Video.NoSources", "Video has no processed sources yet — wait for media processing to complete."));
 
@@ -67,10 +64,6 @@ public sealed class Video : AggregateRoot<VideoId>
 
     public Result Delete()
     {
-        if (Status == VideoStatus.Deleted)
-            return Result.Failure(Error.Conflict("Video.AlreadyDeleted", "Video is already deleted."));
-
-        Status = VideoStatus.Deleted;
         RaiseDomainEvent(new VideoDeletedDomainEvent(Id));
         return Result.Success();
     }

@@ -13,7 +13,6 @@ public sealed class VideoSource
 
     public VideoSource(Resolution resolution, string url, string format)
     {
-        Id = Guid.NewGuid();
         Resolution = resolution;
         Url = url;
         Format = format;
