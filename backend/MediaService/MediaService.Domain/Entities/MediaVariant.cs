@@ -16,7 +16,6 @@ public sealed class MediaVariant
 
     public MediaVariant(Resolution resolution, int bitrateKbps, string storagePath, long fileSizeBytes)
     {
-        Id = Guid.NewGuid();
         Resolution = resolution;
         BitrateKbps = bitrateKbps;
         StoragePath = storagePath;
