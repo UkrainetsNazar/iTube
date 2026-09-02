@@ -14,6 +14,7 @@ public sealed class VideoRepository(VideoDbContext context) : IVideoRepository
 
     public void Add(Video video) => context.Videos.Add(video);
     public void Update(Video video) => context.Videos.Update(video);
+    public void Remove(Video video) => context.Videos.Remove(video);
 
     public async Task<IReadOnlyList<Video>> GetByChannelAsync(Guid channelId, int page, int pageSize, CancellationToken ct)
         => await context.Videos

@@ -36,7 +36,6 @@ public sealed class MediaProcessingCompletedConsumer(
             video.AttachSource(resolution, variant.Url, variant.Format);
         }
 
-        repository.Update(video);
         await unitOfWork.SaveChangesAsync(context.CancellationToken);
     }
 }
