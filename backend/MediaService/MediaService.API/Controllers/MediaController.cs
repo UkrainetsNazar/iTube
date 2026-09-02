@@ -4,6 +4,8 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Api.Extensions;
+using MediaService.Application.Queries.GetMediaAssetStatus;
+using Shared.Domain.ValueObjects;
 
 namespace MediaService.API.Controllers;
 
@@ -13,7 +15,8 @@ namespace MediaService.API.Controllers;
 public sealed class MediaController(ISender sender) : ControllerBase
 {
     [HttpPost("upload")]
-    [RequestSizeLimit(500_000_000)]
+    [RequestSizeLimit(2_000_000_000)]
+    [RequestFormLimits(MultipartBodyLengthLimit = 2_000_000_000)]
     public async Task<IActionResult> Upload([FromForm] UploadMediaRequest request, CancellationToken ct)
     {
         if (!Enum.TryParse<Domain.Enums.MediaType>(request.MediaType, ignoreCase: true, out var mediaType))
@@ -32,6 +35,13 @@ public sealed class MediaController(ISender sender) : ControllerBase
             request.VideoId,
             request.ChannelId), ct);
 
+        return result.ToActionResult();
+    }
+
+    [HttpGet("{id:guid}/status")]
+    public async Task<IActionResult> GetStatus(Guid id, CancellationToken ct)
+    {
+        var result = await sender.Send(new GetMediaAssetStatusQuery(new MediaAssetId(id)), ct);
         return result.ToActionResult();
     }
 }
