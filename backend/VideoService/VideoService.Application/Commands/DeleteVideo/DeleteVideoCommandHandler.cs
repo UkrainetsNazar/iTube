@@ -21,7 +21,7 @@ public sealed class DeleteVideoCommandHandler(
         var result = video.Delete();
         if (result.IsFailure) return result;
 
-        repository.Update(video);
+        repository.Remove(video);
         await unitOfWork.SaveChangesAsync(ct);
         return Result.Success();
     }
