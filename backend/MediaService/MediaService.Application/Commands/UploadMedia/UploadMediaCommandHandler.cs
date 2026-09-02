@@ -25,7 +25,7 @@ public sealed class UploadMediaCommandHandler(
                 Error.Validation("Media.MissingChannelId", "channelId is required for avatar/banner uploads."));
 
         var objectKey = $"{Guid.NewGuid()}-{request.OriginalFileName}";
-        
+
         var bucket = request.MediaType == Domain.Enums.MediaType.RawVideo
             ? MediaBuckets.RawVideos : MediaBuckets.Images;
         var storagePath = await storageService.UploadAsync(request.Content, bucket, objectKey, request.ContentType, ct);
@@ -41,6 +41,6 @@ public sealed class UploadMediaCommandHandler(
         if (asset.MediaType == Domain.Enums.MediaType.RawVideo)
             await processingQueue.EnqueueAsync(asset.Id, ct);
 
-        return Result.Success(new UploadMediaResponse(asset.Id.Value, asset.Status.ToString()));
+        return Result.Success(new UploadMediaResponse(asset.Id.Value, asset.Status.ToString(), bucket, objectKey));
     }
 }

@@ -13,4 +13,4 @@ public sealed record UploadMediaCommand(
     Guid? VideoId,
     Guid? ChannelId) : IRequest<Result<UploadMediaResponse>>;
 
-public sealed record UploadMediaResponse(Guid MediaAssetId, string Status);
+public sealed record UploadMediaResponse(Guid MediaAssetId, string Status, string Bucket, string Key);
