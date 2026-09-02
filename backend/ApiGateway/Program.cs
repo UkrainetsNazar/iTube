@@ -16,6 +16,9 @@ try
 
     var builder = WebApplication.CreateBuilder(args);
 
+    var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+    ?? ["http://localhost:5020"];
+
     builder.Host.UseSerilog((context, services, configuration) => configuration
         .ReadFrom.Configuration(context.Configuration)
         .ReadFrom.Services(services)
@@ -47,6 +50,11 @@ try
 
     builder.Services.AddAuthorization();
 
+    builder.WebHost.ConfigureKestrel(options =>
+    {
+        options.Limits.MaxRequestBodySize = 2_000_000_000;
+    });
+
     builder.Services.AddRateLimiter(options =>
     {
         options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
@@ -66,10 +74,23 @@ try
         });
     });
 
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy("Frontend", policy =>
+        {
+            policy.WithOrigins(allowedOrigins)
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials();
+        });
+    });
+
     var app = builder.Build();
 
     app.UseSerilogRequestLogging();
     app.UseGlobalExceptionHandling();
+
+    app.UseCors("Frontend");
 
     app.UseAuthentication();
     app.UseAuthorization();
