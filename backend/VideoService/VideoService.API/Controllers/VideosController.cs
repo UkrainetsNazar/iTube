@@ -122,14 +122,14 @@ public sealed class VideosController(ISender sender) : ControllerBase
     }
 
     [HttpPost("{id:guid}/views")]
-    public async Task<IActionResult> RecordView(Guid id, CancellationToken ct)
+    public async Task<IActionResult> RecordView(Guid id, [FromBody] RecordViewRequest request, CancellationToken ct)
     {
         Guid? userId = null;
         var claim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
         if (claim is not null && Guid.TryParse(claim.Value, out var parsed))
             userId = parsed;
 
-        var result = await sender.Send(new RecordViewCommand(new VideoId(id), userId), ct);
+        var result = await sender.Send(new RecordViewCommand(new VideoId(id), userId, request.WatchedSeconds), ct);
         return result.ToActionResult();
     }
 
