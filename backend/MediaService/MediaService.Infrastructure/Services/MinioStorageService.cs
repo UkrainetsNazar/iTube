@@ -1,4 +1,5 @@
 using MediaService.Application.Interfaces;
+using MediaService.Domain.Constants;
 using Minio;
 using Minio.DataModel.Args;
 
@@ -46,6 +47,24 @@ public sealed class MinioStorageService(IMinioClient minioClient) : IVideoStorag
         var exists = await minioClient.BucketExistsAsync(new BucketExistsArgs().WithBucket(bucket), ct);
         if (!exists)
             await minioClient.MakeBucketAsync(new MakeBucketArgs().WithBucket(bucket), ct);
+
+        if (MediaBuckets.Public.Contains(bucket))
+        {
+            var policy = $$"""
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": { "AWS": ["*"] },
+              "Action": ["s3:GetObject"],
+              "Resource": ["arn:aws:s3:::{{bucket}}/*"]
+            }
+          ]
+        }
+        """;
+            await minioClient.SetPolicyAsync(new SetPolicyArgs().WithBucket(bucket).WithPolicy(policy), ct);
+        }
     }
 
     private static (string Bucket, string Key) ParseStoragePath(string storagePath)

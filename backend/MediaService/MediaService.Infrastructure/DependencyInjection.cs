@@ -1,12 +1,16 @@
+using System.Text;
 using MassTransit;
 using MediaService.Application.Interfaces;
 using MediaService.Infrastructure.Persistence;
 using MediaService.Infrastructure.Processing;
 using MediaService.Infrastructure.Repositories;
 using MediaService.Infrastructure.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using Minio;
 using Shared.Domain.Interfaces;
 
@@ -20,6 +24,11 @@ public static class DependencyInjection
             options.UseNpgsql(configuration.GetConnectionString("MediaDb")));
 
         services.AddScoped<IMediaAssetRepository, MediaAssetRepository>();
+
+        services.Configure<FormOptions>(options =>
+        {
+            options.MultipartBodyLengthLimit = 2_000_000_000;
+        });
 
         services.AddMinio(client => client
             .WithEndpoint(configuration["Minio:Endpoint"])
@@ -39,6 +48,24 @@ public static class DependencyInjection
                 });
             });
         });
+
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidIssuer = configuration["Jwt:Issuer"],
+                    ValidateAudience = true,
+                    ValidAudience = configuration["Jwt:Audience"],
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
+                        configuration["Jwt:Secret"] ?? throw new InvalidOperationException("Jwt:Secret is not configured."))),
+                    ValidateLifetime = true
+                };
+            });
+
+        services.AddAuthorization();
 
         services.AddScoped<IVideoStorageService, MinioStorageService>();
         services.AddScoped<IVideoProcessor, FfmpegVideoProcessor>();
