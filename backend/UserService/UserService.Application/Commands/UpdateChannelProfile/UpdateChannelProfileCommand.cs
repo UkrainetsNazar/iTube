@@ -1,6 +1,5 @@
 using MediatR;
 using Shared.Domain.Common;
-using Shared.Domain.ValueObjects;
 
 namespace UserService.Application.Commands.UpdateChannelProfile;
 

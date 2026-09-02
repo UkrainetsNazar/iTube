@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.Extensions.Configuration;
 using Shared.Domain.Common;
 using Shared.Domain.Interfaces;
 using Shared.Domain.ValueObjects;
@@ -9,7 +10,8 @@ namespace UserService.Application.Commands.UpdateChannelProfile;
 
 public sealed class UpdateChannelProfileCommandHandler(
     IChannelRepository channelRepository,
-    IUnitOfWork unitOfWork
+    IUnitOfWork unitOfWork,
+    IConfiguration configuration
 ) : IRequestHandler<UpdateChannelProfileCommand, Result>
 {
     public async Task<Result> Handle(UpdateChannelProfileCommand request, CancellationToken ct)
@@ -32,19 +34,23 @@ public sealed class UpdateChannelProfileCommandHandler(
             description = descResult.Value;
         }
 
-        MediaReference? avatar = null;
+        var baseUrl = configuration["Storage:PublicBaseUrl"]!.TrimEnd('/');
+
+        MediaReference? avatar = channel.Avatar;
         if (request.AvatarBucket is not null && request.AvatarKey is not null)
         {
-            var avatarResult = MediaReference.Create(request.AvatarBucket, request.AvatarKey);
+            var avatarUrl = $"{baseUrl}/{request.AvatarBucket}/{request.AvatarKey}";
+            var avatarResult = MediaReference.Create(request.AvatarBucket, request.AvatarKey, avatarUrl);
             if (avatarResult.IsFailure)
                 return Result.Failure(avatarResult.Error);
             avatar = avatarResult.Value;
         }
 
-        MediaReference? banner = null;
+        MediaReference? banner = channel.Banner;
         if (request.BannerBucket is not null && request.BannerKey is not null)
         {
-            var bannerResult = MediaReference.Create(request.BannerBucket, request.BannerKey);
+            var bannerUrl = $"{baseUrl}/{request.BannerBucket}/{request.BannerKey}";
+            var bannerResult = MediaReference.Create(request.BannerBucket, request.BannerKey, bannerUrl);
             if (bannerResult.IsFailure)
                 return Result.Failure(bannerResult.Error);
             banner = bannerResult.Value;
