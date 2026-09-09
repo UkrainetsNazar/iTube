@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useDeleteVideo, useMyVideos, usePublishVideo, useSetVisibility } from '@/hooks/useVideos';
 import { UploadFlow } from '@/components/upload/UploadFlow';
+import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import { Pagination } from '@/components/common/Pagination';
 import { RowsSkeleton } from '@/components/common/Skeletons';
 import { EmptyState } from '@/components/common/EmptyState';
@@ -18,7 +19,6 @@ const statusStyles: Record<VideoDto['status'], string> = {
 
 const visibilityStyles: Record<Visibility, string> = {
   Public: 'border-moss/40 text-moss',
-  Unlisted: 'border-signal/40 text-signal',
   Private: 'border-border text-paper-dim',
 };
 
@@ -30,6 +30,7 @@ export function StudioPage() {
   const publish = usePublishVideo();
   const deleteVideo = useDeleteVideo();
   const [draftVisibility, setDraftVisibility] = useState<Record<string, Visibility>>({});
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   const showUpload = params.get('upload') === '1';
 
@@ -37,6 +38,13 @@ export function StudioPage() {
     const next = new URLSearchParams(params);
     next.delete('upload');
     setParams(next, { replace: true });
+  }
+
+  function handleConfirmDelete() {
+    if (!confirmDeleteId) return;
+    deleteVideo.mutate(confirmDeleteId, {
+      onSettled: () => setConfirmDeleteId(null),
+    });
   }
 
   return (
@@ -89,7 +97,6 @@ export function StudioPage() {
                         className={`rounded-card border bg-transparent px-2 py-1 text-xs ${visibilityStyles[video.visibility]}`}
                       >
                         <option value="Public">Public</option>
-                        <option value="Unlisted">Unlisted</option>
                         <option value="Private">Private</option>
                       </select>
                     ) : video.status === 'Draft' ? (
@@ -102,7 +109,6 @@ export function StudioPage() {
                         className="rounded-card border border-border bg-transparent px-2 py-1 text-xs text-paper-dim"
                       >
                         <option value="Public">Public</option>
-                        <option value="Unlisted">Unlisted</option>
                         <option value="Private">Private</option>
                       </select>
                     ) : (
@@ -126,10 +132,7 @@ export function StudioPage() {
                         </button>
                       )}
                       <button
-                        onClick={() => {
-                          if (confirm('Delete this video? This cannot be undone.')) deleteVideo.mutate(video.id);
-                        }}
-                        disabled={deleteVideo.isPending}
+                        onClick={() => setConfirmDeleteId(video.id)}
                         className="text-xs text-paper-faint hover:text-danger"
                       >
                         Delete
@@ -154,6 +157,18 @@ export function StudioPage() {
       )}
 
       {showUpload && <UploadFlow onClose={closeUpload} />}
+
+      {confirmDeleteId && (
+        <ConfirmDialog
+          title="Delete this video?"
+          message="This can't be undone. The video, its comments, and its stats will be permanently removed."
+          confirmLabel="Delete video"
+          danger
+          isLoading={deleteVideo.isPending}
+          onConfirm={handleConfirmDelete}
+          onCancel={() => setConfirmDeleteId(null)}
+        />
+      )}
     </div>
   );
 }

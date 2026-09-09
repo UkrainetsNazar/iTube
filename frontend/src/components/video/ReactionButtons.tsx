@@ -23,7 +23,7 @@ export function ReactionButtons({ video }: { video: VideoDto }) {
       <button
         onClick={() => handleReact('Like')}
         disabled={react.isPending}
-        className="flex items-center gap-2 px-4 py-2 text-sm text-paper hover:bg-surface disabled:opacity-50"
+        className="flex items-center gap-2 px-4 py-2 text-sm text-paper transition-all duration-150 hover:bg-surface active:scale-[0.96] disabled:opacity-50"
       >
         <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
           <path
@@ -39,7 +39,7 @@ export function ReactionButtons({ video }: { video: VideoDto }) {
       <button
         onClick={() => handleReact('Dislike')}
         disabled={react.isPending}
-        className="flex items-center gap-2 px-4 py-2 text-sm text-paper hover:bg-surface disabled:opacity-50"
+        className="flex items-center gap-2 px-4 py-2 text-sm text-paper transition-all duration-150 hover:bg-surface active:scale-[0.96] disabled:opacity-50"
       >
         <svg width="16" height="16" viewBox="0 0 20 20" fill="none" style={{ transform: 'rotate(180deg)' }}>
           <path

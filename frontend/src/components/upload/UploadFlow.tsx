@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { videosApi } from '@/api/videos';
 import { mediaApi } from '@/api/media';
@@ -76,9 +77,6 @@ export function UploadFlow({ onClose }: UploadFlowProps) {
       setStep('uploading');
       await runMediaUpload(newId, file);
     } catch {
-      // Errors already surfaced via each mutation's onError toast. The
-      // video may already exist as a Draft server-side at this point --
-      // it'll be visible (and resumable) from the Studio list either way.
     }
   }
 
@@ -91,9 +89,6 @@ export function UploadFlow({ onClose }: UploadFlowProps) {
       setStep('checking-status');
       startStatusPolling(result.mediaAssetId, id);
     } catch {
-      // uploadMedia's onError already toasted. Route into the same
-      // failed/retry UI as a processing failure, rather than leaving the
-      // modal stuck on a stale progress bar.
       setFailureReason('Could not upload the file. Check your connection and try again.');
       setStep('failed');
     }
@@ -115,10 +110,7 @@ export function UploadFlow({ onClose }: UploadFlowProps) {
           setFailureReason(reason ?? 'Processing failed for an unknown reason.');
           setStep('failed');
         }
-        // Pending / Processing: keep polling, just update the message.
       } catch {
-        // A transient failure to check status shouldn't kill the flow --
-        // keep polling and try again next tick.
       }
     }, STATUS_POLL_INTERVAL_MS);
   }
@@ -155,16 +147,22 @@ export function UploadFlow({ onClose }: UploadFlowProps) {
     onClose();
   }
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-      <div className="w-full max-w-lg rounded-card border border-border bg-surface p-6">
-        <div className="mb-5 flex items-center justify-between">
+      return createPortal(
+    <div className="fixed inset-0 z-50 flex animate-fade-in items-center justify-center bg-black/85 p-4 backdrop-blur-sm">
+      <div className="flex max-h-[90vh] w-full max-w-lg animate-scale-in flex-col rounded-card border border-border bg-surface shadow-2xl">
+        <div className="flex items-center justify-between border-b border-border px-6 py-4">
           <h2 className="font-display text-lg font-semibold text-paper">Upload video</h2>
-          <button onClick={handleCloseMidway} className="text-paper-dim hover:text-paper" aria-label="Close">
+          <button
+            onClick={handleCloseMidway}
+            className="flex h-8 w-8 items-center justify-center rounded-full text-lg text-paper-dim transition-colors hover:bg-surface-raised hover:text-paper"
+            aria-label="Close"
+          >
             ×
           </button>
         </div>
 
+        <div className="overflow-y-auto p-6">
+        <div key={step} className="animate-fade-in-up">
         {step === 'form' && (
           <div className="space-y-4">
             <label className="block text-sm">
@@ -246,7 +244,6 @@ export function UploadFlow({ onClose }: UploadFlowProps) {
                 className="w-full rounded-card border border-border bg-ink px-3 py-2 text-paper focus:border-signal"
               >
                 <option value="Public">Public</option>
-                <option value="Unlisted">Unlisted</option>
                 <option value="Private">Private</option>
               </select>
             </label>
@@ -260,8 +257,11 @@ export function UploadFlow({ onClose }: UploadFlowProps) {
         )}
 
         {step === 'publishing' && <p className="py-6 text-center text-sm text-paper-dim">Publishing…</p>}
+        </div>
+        </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

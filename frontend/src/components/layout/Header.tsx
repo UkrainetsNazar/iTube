@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { SearchBar } from './SearchBar';
 import { useAuthStore } from '@/store/authStore';
 import { useLogout } from '@/hooks/useAuth';
@@ -12,7 +12,9 @@ export function Header({ onMenuClick }: HeaderProps) {
   const currentUser = useAuthStore((s) => s.currentUser);
   const logout = useLogout();
   const navigate = useNavigate();
+  const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const onStudioPage = location.pathname.startsWith('/studio');
 
   return (
     <header className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b border-border bg-ink/95 px-4 backdrop-blur">
@@ -37,75 +39,77 @@ export function Header({ onMenuClick }: HeaderProps) {
       <div className="ml-auto flex items-center gap-3">
         {currentUser ? (
           <>
-            <button
-              onClick={() => navigate('/studio?upload=1')}
-              className="hidden rounded-card bg-signal px-4 py-2 text-sm font-medium text-ink hover:bg-signal-hover sm:block"
-            >
-              Upload
-            </button>
+            {!onStudioPage && (
+              <button
+                onClick={() => navigate('/studio?upload=1')}
+                className="hidden rounded-card bg-signal px-4 py-2 text-sm font-medium text-ink transition-all duration-150 hover:bg-signal-hover active:scale-[0.97] sm:block"
+              >
+                Upload
+              </button>
+            )}
             <div className="relative">
               <button
                 onClick={() => setMenuOpen((v) => !v)}
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-surface-raised text-sm font-medium text-paper hover:bg-surface-hover"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-surface-raised text-sm font-medium text-paper transition-all duration-150 hover:bg-surface-hover active:scale-95"
                 aria-label="Account menu"
               >
                 {currentUser.email.charAt(0).toUpperCase()}
               </button>
-              {menuOpen && (
-                <div
-                  className="absolute right-0 mt-2 w-48 overflow-hidden rounded-card border border-border bg-surface-raised shadow-xl"
-                  onMouseLeave={() => setMenuOpen(false)}
-                >
-                                    <div className="truncate border-b border-border px-4 py-3 text-xs text-paper-dim">
-                    {currentUser.email}
-                  </div>
-                  <Link
-                    to={`/channel/${currentUser.id}`}
-                    onClick={() => setMenuOpen(false)}
-                    className="block px-4 py-2.5 text-sm text-paper hover:bg-surface-hover"
-                  >
-                    Your channel
-                  </Link>
-                  <Link
-                    to="/studio"
-                    onClick={() => setMenuOpen(false)}
-                    className="block px-4 py-2.5 text-sm text-paper hover:bg-surface-hover"
-                  >
-                    Studio
-                  </Link>
-                  <Link
-                    to="/settings"
-                    onClick={() => setMenuOpen(false)}
-                    className="block px-4 py-2.5 text-sm text-paper hover:bg-surface-hover"
-                  >
-                    Settings
-                  </Link>
-                  {(currentUser.role === 'Admin' || currentUser.role === 'Moderator') && (
-                    <Link
-                      to="/admin"
-                      onClick={() => setMenuOpen(false)}
-                      className="block px-4 py-2.5 text-sm text-paper hover:bg-surface-hover"
-                    >
-                      Admin panel
-                    </Link>
-                  )}
-                  <button
-                    onClick={() => {
-                      setMenuOpen(false);
-                      logout.mutate();
-                    }}
-                    className="block w-full px-4 py-2.5 text-left text-sm text-danger hover:bg-surface-hover"
-                  >
-                    Log out
-                  </button>
+              <div
+                className={`absolute right-0 z-10 mt-2 w-48 origin-top-right overflow-hidden rounded-card border border-border bg-surface-raised shadow-xl transition-all duration-150 ease-smooth ${
+                  menuOpen ? 'scale-100 opacity-100' : 'pointer-events-none scale-95 opacity-0'
+                }`}
+                onMouseLeave={() => setMenuOpen(false)}
+              >
+                <div className="truncate border-b border-border px-4 py-3 text-xs text-paper-dim">
+                  {currentUser.email}
                 </div>
-              )}
+                <Link
+                  to={`/channel/${currentUser.id}`}
+                  onClick={() => setMenuOpen(false)}
+                  className="block px-4 py-2.5 text-sm text-paper transition-colors hover:bg-surface-hover"
+                >
+                  Your channel
+                </Link>
+                <Link
+                  to="/studio"
+                  onClick={() => setMenuOpen(false)}
+                  className="block px-4 py-2.5 text-sm text-paper transition-colors hover:bg-surface-hover"
+                >
+                  Studio
+                </Link>
+                <Link
+                  to="/settings"
+                  onClick={() => setMenuOpen(false)}
+                  className="block px-4 py-2.5 text-sm text-paper transition-colors hover:bg-surface-hover"
+                >
+                  Settings
+                </Link>
+                {(currentUser.role === 'Admin' || currentUser.role === 'Moderator') && (
+                  <Link
+                    to="/admin"
+                    onClick={() => setMenuOpen(false)}
+                    className="block px-4 py-2.5 text-sm text-paper transition-colors hover:bg-surface-hover"
+                  >
+                    Admin panel
+                  </Link>
+                )}
+                <button
+                  onClick={() => {
+                    setMenuOpen(false);
+                    logout.mutate();
+                  }}
+                  className="block w-full px-4 py-2.5 text-left text-sm text-danger transition-colors hover:bg-surface-hover"
+                >
+                  Log out
+                </button>
+              </div>
             </div>
           </>
         ) : (
           <Link
             to="/login"
-            className="rounded-card border border-border px-4 py-2 text-sm font-medium text-paper hover:border-signal"
+            className="rounded-card border border-border px-4 py-2 text-sm font-medium text-paper transition-all duration-150 hover:border-signal active:scale-[0.97]"
           >
             Sign in
           </Link>

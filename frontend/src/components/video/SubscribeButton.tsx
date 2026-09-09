@@ -14,7 +14,7 @@ export function SubscribeButton({ channelId }: { channelId: string }) {
     <button
       onClick={toggle}
       disabled={isLoading || isToggling}
-      className={`rounded-card px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50 ${
+      className={`rounded-card px-4 py-2 text-sm font-medium transition-all duration-150 active:scale-[0.97] disabled:opacity-50 disabled:active:scale-100 ${
         isSubscribed
           ? 'border border-border text-paper hover:border-danger hover:text-danger'
           : 'bg-signal text-ink hover:bg-signal-hover'

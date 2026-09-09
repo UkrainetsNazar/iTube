@@ -7,7 +7,7 @@ export interface CurrentUser {
 }
 
 export type VideoStatus = 'Draft' | 'Published' | 'Deleted';
-export type Visibility = 'Public' | 'Unlisted' | 'Private';
+export type Visibility = 'Public' | 'Private';
 
 export interface VideoSource {
   resolution: string;

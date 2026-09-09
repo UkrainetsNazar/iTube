@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { VideoDto, VideoSearchHit } from '@/types';
 import { formatCount, formatRelativeDate } from '@/lib/format';
@@ -12,11 +13,16 @@ const PLACEHOLDER_THUMB =
 
 interface VideoCardProps {
   video: VideoDto | VideoSearchHit;
+  /** Search hits don't carry authorId (see api/search.ts) -- pass it explicitly when known (e.g. from a channel page). */
   authorId?: string;
 }
 
 export function VideoCard({ video, authorId }: VideoCardProps) {
+  // Search results (VideoSearchHit) don't include authorId at all -- no
+  // channel to fetch or link to in that case. See the gap noted in
+  // src/types/index.ts.
   const { data: channel } = useChannel(authorId);
+  const [thumbLoaded, setThumbLoaded] = useState(false);
 
   return (
     <div className="group">
@@ -25,7 +31,10 @@ export function VideoCard({ video, authorId }: VideoCardProps) {
           <img
             src={video.thumbnailUrl ?? PLACEHOLDER_THUMB}
             alt=""
-            className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-[1.02]"
+            onLoad={() => setThumbLoaded(true)}
+            className={`h-full w-full object-cover transition-all duration-300 ease-smooth group-hover:scale-[1.03] ${
+              thumbLoaded ? 'opacity-100' : 'opacity-0'
+            }`}
             loading="lazy"
           />
         </div>
@@ -38,10 +47,12 @@ export function VideoCard({ video, authorId }: VideoCardProps) {
         )}
         <div className="min-w-0">
           <Link to={`/watch/${video.id}`}>
-            <h3 className="line-clamp-2 text-sm font-medium text-paper">{video.title}</h3>
+            <h3 className="line-clamp-2 text-sm font-medium text-paper transition-colors group-hover:text-signal">
+              {video.title}
+            </h3>
           </Link>
           {authorId && (
-            <Link to={`/channel/${authorId}`} className="text-xs text-paper-dim hover:text-paper">
+            <Link to={`/channel/${authorId}`} className="text-xs text-paper-dim transition-colors hover:text-paper">
               {channel?.name ?? '\u00A0'}
             </Link>
           )}

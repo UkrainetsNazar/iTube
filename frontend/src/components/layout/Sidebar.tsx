@@ -121,17 +121,31 @@ export function Sidebar({ open, onClose }: SidebarProps) {
         {content}
       </aside>
 
-      {open && (
-        <div className="fixed inset-0 z-30 lg:hidden">
-          <div className="absolute inset-0 bg-black/60" onClick={onClose} />
-          <aside className="absolute left-0 top-0 h-full w-64 bg-ink-soft border-r border-border bg-ink">
-            <div className="flex h-16 items-center px-4 font-display text-lg font-semibold">
-              i<span className="text-signal">Tube</span>
-            </div>
-            {content}
-          </aside>
-        </div>
-      )}
+      {/* Always mounted (not conditional on `open`) so both the open and
+          close transitions can actually play -- conditionally rendering
+          only on `open` would pop the drawer in/out instantly with no
+          animation on the way out. */}
+      <div
+        className={`fixed inset-0 z-30 lg:hidden ${open ? '' : 'pointer-events-none'}`}
+        aria-hidden={!open}
+      >
+        <div
+          className={`absolute inset-0 bg-black/60 transition-opacity duration-200 ease-smooth ${
+            open ? 'opacity-100' : 'opacity-0'
+          }`}
+          onClick={onClose}
+        />
+        <aside
+          className={`absolute left-0 top-0 h-full w-64 border-r border-border bg-ink transition-transform duration-200 ease-smooth ${
+            open ? 'translate-x-0' : '-translate-x-full'
+          }`}
+        >
+          <div className="flex h-16 items-center px-4 font-display text-lg font-semibold">
+            i<span className="text-signal">Tube</span>
+          </div>
+          {content}
+        </aside>
+      </div>
     </>
   );
 }

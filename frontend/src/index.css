@@ -27,3 +27,18 @@ body {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* Respect the OS-level motion preference -- collapses every transition
+   and animation to effectively instant instead of disabling them outright
+   (disabling entirely can break logic that relies on transitionend/
+   animationend firing). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

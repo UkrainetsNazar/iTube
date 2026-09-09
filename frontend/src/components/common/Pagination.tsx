@@ -27,7 +27,7 @@ export function Pagination({ page, pageSize, itemCount, totalCount, onPageChange
       <button
         onClick={() => onPageChange(page - 1)}
         disabled={!canGoPrev}
-        className="rounded-card border border-border px-4 py-2 text-paper disabled:opacity-30 disabled:cursor-not-allowed hover:border-signal transition-colors"
+        className="rounded-card border border-border px-4 py-2 text-paper transition-all duration-150 hover:border-signal active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-30 disabled:active:scale-100"
       >
         Previous
       </button>
@@ -35,7 +35,7 @@ export function Pagination({ page, pageSize, itemCount, totalCount, onPageChange
       <button
         onClick={() => onPageChange(page + 1)}
         disabled={!canGoNext}
-        className="rounded-card border border-border px-4 py-2 text-paper disabled:opacity-30 disabled:cursor-not-allowed hover:border-signal transition-colors"
+        className="rounded-card border border-border px-4 py-2 text-paper transition-all duration-150 hover:border-signal active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-30 disabled:active:scale-100"
       >
         Next
       </button>
