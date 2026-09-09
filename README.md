@@ -50,7 +50,7 @@ Supporting infrastructure: **PostgreSQL** (isolated DB per service), **RabbitMQ*
 
 **Backend**: .NET 8 / ASP.NET Core, C# 12, EF Core + PostgreSQL, MediatR (CQRS) + FluentValidation, MassTransit + RabbitMQ, YARP, MinIO .NET SDK, FFmpeg (CLI), Elastic.Clients.Elasticsearch, StackExchange.Redis, Serilog. Domain-Driven Design throughout: aggregates, value objects, domain events, Result-based error handling.
 
-**Frontend**: React + TypeScript + Vite, React Router, TanStack Query, Zustand (auth state), Axios, Tailwind CSS. No animation library — Tailwind keyframes only. See [`frontend/README.md`](./frontend/README.md) for frontend-specific architecture notes.
+**Frontend**: React + TypeScript + Vite, React Router, TanStack Query, Zustand (auth state), Axios, Tailwind CSS. No animation library — Tailwind keyframes only. See [`frontend/README.md`](./docs/Frontend-README.md) for frontend-specific architecture notes.
 
 ## Features
 
@@ -109,7 +109,7 @@ Each backend service exposes Swagger UI in Development mode at `http://localhost
 ## Documentation
 
 - [`docs/API-Reference.md`](./docs/API-Reference.md) — full endpoint reference (routes, auth, request/response shapes, known behaviors)
-- [`frontend/README.md`](./frontend/README.md) — frontend architecture, patterns, and gaps against the backend contract
+- [`frontend/README.md`](./docs/Frontend-README.md) — frontend architecture, patterns, and gaps against the backend contract
 
 ## Project structure
 
