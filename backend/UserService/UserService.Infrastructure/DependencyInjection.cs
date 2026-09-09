@@ -36,6 +36,8 @@ public static class DependencyInjection
             });
 
             busConfigurator.AddConsumer<EmailConfirmedConsumer>();
+            busConfigurator.AddConsumer<VideoPublishedConsumer>();
+            busConfigurator.AddConsumer<VideoDeletedConsumer>();
 
             busConfigurator.UsingRabbitMq((context, cfg) =>
             {
