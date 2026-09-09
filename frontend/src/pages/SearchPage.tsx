@@ -13,6 +13,7 @@ export function SearchPage() {
   const tags = tagsParam ? tagsParam.split(',').map((t) => t.trim()).filter(Boolean) : [];
   const [page, setPage] = useState(1);
   const [tagInput, setTagInput] = useState(tagsParam);
+  const hasSearch = q.trim().length > 0 || tags.length > 0;
 
   useEffect(() => setPage(1), [q, tagsParam]);
 
@@ -34,35 +35,33 @@ export function SearchPage() {
             <>
               Results for <span className="text-signal">"{q}"</span>
             </>
+          ) : tags.length > 0 ? (
+            <>
+              Results tagged{' '}
+              {tags.map((tag, i) => (
+                <span key={tag} className="text-signal">
+                  #{tag}
+                  {i < tags.length - 1 ? ', ' : ''}
+                </span>
+              ))}
+            </>
           ) : (
             'Search'
           )}
         </h1>
-        <form onSubmit={handleTagSubmit} className="flex gap-2">
-          <input
-            value={tagInput}
-            onChange={(e) => setTagInput(e.target.value)}
-            placeholder="Filter by tags, comma-separated"
-            className="w-64 rounded-card border border-border bg-surface px-3 py-1.5 text-sm text-paper placeholder:text-paper-faint focus:border-signal"
-          />
-          <button
-            type="submit"
-            className="rounded-card border border-border px-3 py-1.5 text-sm text-paper hover:border-signal"
-          >
-            Apply
-          </button>
-        </form>
       </div>
 
-      {!q ? (
-        <p className="py-24 text-center text-paper-dim">Search for something to get started.</p>
+      {!hasSearch ? (
+        <p className="py-24 text-center text-paper-dim">
+          Search for something, or filter by tags, to get started.
+        </p>
       ) : (
         <>
           <VideoGrid
             videos={data?.hits}
             isLoading={isLoading}
             emptyTitle="No results"
-            emptyHint="Try a different search term or remove your tag filter."
+            emptyHint="Try a different search term or a different tag."
           />
           {data && data.hits.length > 0 && (
             <Pagination

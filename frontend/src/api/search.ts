@@ -6,7 +6,7 @@ export const searchApi = {
     apiClient
       .get<SearchResponse>('/videos/search', {
         params: {
-          q,
+          q: q.trim() ? q.trim() : undefined,
           tags: tags.length ? tags.join(',') : undefined,
           page,
           pageSize,

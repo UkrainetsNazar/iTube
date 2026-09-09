@@ -56,7 +56,7 @@ export function WatchPage() {
               {video.tags.map((tag) => (
                 <Link
                   key={tag}
-                  to={`/search?q=${encodeURIComponent(tag)}&tags=${encodeURIComponent(tag)}`}
+                  to={`/search?tags=${encodeURIComponent(tag)}`}
                   className="rounded-full bg-surface-raised px-2.5 py-1 text-xs text-paper-dim hover:text-signal"
                 >
                   #{tag}
