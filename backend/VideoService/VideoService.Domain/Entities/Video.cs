@@ -16,6 +16,7 @@ public sealed class Video : AggregateRoot<VideoId>
     public VideoVisibility Visibility { get; private set; }
     public Guid AuthorId { get; private set; }
     public string? ThumbnailUrl { get; private set; }
+    public string? FailureReason { get; private set; }
     public long ViewsCount { get; private set; }
     public int LikesCount { get; private set; }
     public int DislikesCount { get; private set; }
@@ -37,7 +38,7 @@ public sealed class Video : AggregateRoot<VideoId>
         Description = description;
         _tags.AddRange(tags);
         AuthorId = authorId;
-        Status = VideoStatus.Draft;
+        Status = VideoStatus.Uploading;
         Visibility = VideoVisibility.Private;
         CreatedAt = DateTime.UtcNow;
     }
@@ -51,6 +52,12 @@ public sealed class Video : AggregateRoot<VideoId>
 
     public Result Publish(VideoVisibility visibility)
     {
+        if (Status == VideoStatus.Published)
+            return Result.Failure(Error.Conflict("Video.AlreadyPublished", "Video is already published — use the visibility endpoint to change it."));
+
+        if (Status == VideoStatus.Uploading)
+            return Result.Failure(Error.Conflict("Video.StillUploading", "Video is still being processed."));
+
         if (_sources.Count == 0)
             return Result.Failure(Error.Conflict("Video.NoSources", "Video has no processed sources yet — wait for media processing to complete."));
 
@@ -62,9 +69,19 @@ public sealed class Video : AggregateRoot<VideoId>
         return Result.Success();
     }
 
+    public Result MarkAsFailed(string reason)
+    {
+        if (Status is VideoStatus.Published or VideoStatus.Failed)
+            return Result.Failure(Error.Conflict("Video.CannotMarkFailed", $"Cannot mark as failed from status {Status}."));
+
+        Status = VideoStatus.Failed;
+        FailureReason = reason;
+        return Result.Success();
+    }
+
     public Result Delete()
     {
-        RaiseDomainEvent(new VideoDeletedDomainEvent(Id));
+        RaiseDomainEvent(new VideoDeletedDomainEvent(Id, AuthorId, Status == VideoStatus.Published));
         return Result.Success();
     }
 
@@ -74,6 +91,10 @@ public sealed class Video : AggregateRoot<VideoId>
             return Result.Failure(Error.Conflict("Video.SourceExists", $"Source for {resolution} already exists."));
 
         _sources.Add(new VideoSource(resolution, url, format));
+
+        if (Status == VideoStatus.Uploading)
+            Status = VideoStatus.Draft;
+
         return Result.Success();
     }
 

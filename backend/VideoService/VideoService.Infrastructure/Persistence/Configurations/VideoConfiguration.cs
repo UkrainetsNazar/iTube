@@ -21,6 +21,7 @@ public sealed class VideoConfiguration : IEntityTypeConfiguration<Video>
         builder.Property(v => v.Status).HasConversion<string>().HasMaxLength(50);
         builder.Property(v => v.Visibility).HasConversion<string>().HasMaxLength(50);
         builder.Property(v => v.ThumbnailUrl).HasMaxLength(1000);
+        builder.Property(v => v.FailureReason).HasMaxLength(2000);
 
         builder.OwnsOne(v => v.Title, t => t.Property(x => x.Value).HasColumnName("Title").HasMaxLength(200).IsRequired());
         builder.OwnsOne(v => v.Description, d => d.Property(x => x.Value).HasColumnName("Description").HasMaxLength(5000));

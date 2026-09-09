@@ -3,4 +3,4 @@ using Shared.Domain.ValueObjects;
 
 namespace VideoService.Domain.Events;
 
-public sealed record VideoDeletedDomainEvent(VideoId VideoId) : DomainEvent;
+public sealed record VideoDeletedDomainEvent(VideoId VideoId, Guid AuthorId, bool WasPublished) : DomainEvent;

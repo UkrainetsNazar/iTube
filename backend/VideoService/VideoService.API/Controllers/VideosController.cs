@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -61,7 +62,12 @@ public sealed class VideosController(ISender sender) : ControllerBase
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> Get(Guid id, CancellationToken ct)
     {
-        var result = await sender.Send(new GetVideoQuery(new VideoId(id)), ct);
+        Guid? requestedBy = null;
+        var claim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (claim is not null && Guid.TryParse(claim.Value, out var parsed))
+            requestedBy = parsed;
+
+        var result = await sender.Send(new GetVideoQuery(new VideoId(id), requestedBy), ct);
         return result.ToActionResult();
     }
 

@@ -11,7 +11,7 @@ public sealed class RecommendationFeedRepository(VideoDbContext context) : IReco
 {
     public async Task<IReadOnlyList<Video>> GetFeedAsync(int page, int pageSize, CancellationToken ct)
     => await context.Videos
-        .Where(v => v.Status == VideoStatus.Published)
+        .Where(v => v.Status == VideoStatus.Published && v.Visibility == VideoVisibility.Public)
         .OrderByDescending(v => v.PublishedAt)
         .Skip((page - 1) * pageSize)
         .Take(pageSize)
@@ -20,7 +20,7 @@ public sealed class RecommendationFeedRepository(VideoDbContext context) : IReco
     public async Task<IReadOnlyList<Video>> GetByTagOverlapAsync(IReadOnlyList<string> tags, VideoId? excludeVideoId, int limit, CancellationToken ct)
     {
         var candidates = await context.Videos
-            .Where(v => v.Status == VideoStatus.Published)
+            .Where(v => v.Status == VideoStatus.Published && v.Visibility == VideoVisibility.Public)
             .Where(v => excludeVideoId == null || v.Id != excludeVideoId)
             .ToListAsync(ct);
 
@@ -65,7 +65,7 @@ public sealed class RecommendationFeedRepository(VideoDbContext context) : IReco
 
     public async Task<IReadOnlyList<Video>> GetTopViewedAsync(int limit, IReadOnlyCollection<VideoId> excludeIds, CancellationToken ct)
         => await context.Videos
-            .Where(v => v.Status == VideoStatus.Published && !excludeIds.Contains(v.Id))
+            .Where(v => v.Status == VideoStatus.Published && v.Visibility == VideoVisibility.Public && !excludeIds.Contains(v.Id))
             .OrderByDescending(v => v.ViewsCount)
             .Take(limit)
             .ToListAsync(ct);

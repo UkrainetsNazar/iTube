@@ -56,6 +56,7 @@ public static class DependencyInjection
             busConfigurator.AddConsumer<MediaProcessingCompletedConsumer>();
             busConfigurator.AddConsumer<UserSubscribedIntegrationEventConsumer>();
             busConfigurator.AddConsumer<UserUnsubscribedIntegrationEventConsumer>();
+            busConfigurator.AddConsumer<MediaProcessingFailedIntegrationEventConsumer>();
 
             busConfigurator.UsingRabbitMq((context, cfg) =>
             {

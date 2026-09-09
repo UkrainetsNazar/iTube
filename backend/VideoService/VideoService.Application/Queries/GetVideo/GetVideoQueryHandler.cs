@@ -15,6 +15,9 @@ public sealed class GetVideoQueryHandler(
         if (video is null)
             return Result.Failure<VideoDto>(Error.NotFound("Video.NotFound", "Video not found."));
 
+        if (video.Visibility == VideoVisibility.Private && video.AuthorId != request.RequestedBy)
+            return Result.Failure<VideoDto>(Error.NotFound("Video.NotFound", "Video not found."));
+
         return Result.Success(VideoDto.FromEntity(video));
     }
 }

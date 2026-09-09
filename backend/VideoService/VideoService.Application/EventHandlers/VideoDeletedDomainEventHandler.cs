@@ -9,5 +9,6 @@ public sealed class VideoDeletedDomainEventHandler(IPublishEndpoint publishEndpo
     : INotificationHandler<VideoDeletedDomainEvent>
 {
     public Task Handle(VideoDeletedDomainEvent notification, CancellationToken ct)
-        => publishEndpoint.Publish(new VideoDeletedIntegrationEvent(notification.VideoId.Value), ct);
+        => publishEndpoint.Publish(new VideoDeletedIntegrationEvent(
+            notification.VideoId.Value, notification.AuthorId, notification.WasPublished), ct);
 }

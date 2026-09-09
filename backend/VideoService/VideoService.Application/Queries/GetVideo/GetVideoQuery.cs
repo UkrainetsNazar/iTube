@@ -5,4 +5,4 @@ using VideoService.Application.DTOs;
 
 namespace VideoService.Application.Queries.GetVideo;
 
-public sealed record GetVideoQuery(VideoId VideoId) : IRequest<Result<VideoDto>>;
+public sealed record GetVideoQuery(VideoId VideoId, Guid? RequestedBy) : IRequest<Result<VideoDto>>;
