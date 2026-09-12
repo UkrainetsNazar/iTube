@@ -20,9 +20,6 @@ export function VideoGrid({ videos, isLoading, emptyTitle = 'No videos yet', emp
         <div
           key={v.id}
           className="animate-fade-in-up"
-          // Cap the stagger so a long grid doesn't take forever to finish
-          // appearing -- everything past the first ~10 cards animates in
-          // together instead of visibly trickling in one by one.
           style={{ animationDelay: `${Math.min(i, 10) * 35}ms` }}
         >
           <VideoCard video={v} authorId={'authorId' in v ? v.authorId : undefined} />

@@ -39,7 +39,8 @@ try
         db.Database.Migrate();
 
         var esClient = scope.ServiceProvider.GetRequiredService<ElasticsearchClient>();
-        await VideoService.Infrastructure.Search.ElasticIndexInitializer.EnsureIndexAsync(esClient);
+        var esLogger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        await VideoService.Infrastructure.Search.ElasticIndexInitializer.EnsureIndexAsync(esClient, esLogger);
     }
 
     if (app.Environment.IsDevelopment())

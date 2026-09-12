@@ -15,6 +15,6 @@ public sealed record VideoSearchDocument(
 
 public sealed record VideoSearchHit(
     Guid VideoId, string Title, string Description, IReadOnlyList<string> Tags,
-    string? ThumbnailUrl, long ViewsCount, double Score);
+    string? ThumbnailUrl, long ViewsCount, double Score, Guid AuthorId, DateTime PublishedAt);
 
 public sealed record VideoSearchResult(IReadOnlyList<VideoSearchHit> Hits, long TotalCount);

@@ -1,5 +1,6 @@
 using Elastic.Clients.Elasticsearch;
 using Elastic.Clients.Elasticsearch.Mapping;
+using Microsoft.Extensions.Logging;
 
 namespace VideoService.Infrastructure.Search;
 
@@ -7,28 +8,62 @@ public static class ElasticIndexInitializer
 {
     public const string IndexName = "videos";
 
-    public static async Task EnsureIndexAsync(ElasticsearchClient client, CancellationToken ct = default)
+    public static async Task EnsureIndexAsync(ElasticsearchClient client, ILogger logger, CancellationToken ct = default)
     {
-        var exists = await client.Indices.ExistsAsync(IndexName, ct);
-        if (exists.Exists) return;
+        var existsResponse = await client.Indices.ExistsAsync(IndexName, ct);
 
-        await client.Indices.CreateAsync(IndexName, c => c
+        if (!existsResponse.ApiCallDetails.HasSuccessfulStatusCode && existsResponse.ApiCallDetails.HttpStatusCode != 404)
+            throw new InvalidOperationException(
+                $"Failed to check whether Elasticsearch index '{IndexName}' exists. HTTP {existsResponse.ApiCallDetails.HttpStatusCode}. {existsResponse.DebugInformation}");
+
+        if (existsResponse.Exists)
+        {
+            logger.LogInformation("Elasticsearch index '{IndexName}' already exists.", IndexName);
+            return;
+        }
+
+        logger.LogInformation("Elasticsearch index '{IndexName}' not found — creating it.", IndexName);
+
+        var createResponse = await client.Indices.CreateAsync(IndexName, c => c
             .Settings(s => s
                 .Analysis(a => a
-                    .Tokenizers(t => t.EdgeNGram("edge_ngram_tokenizer", e => e
+                    .TokenFilters(tf => tf.EdgeNGram("edge_ngram_filter", e => e
                         .MinGram(2).MaxGram(15)))
                     .Analyzers(an => an.Custom("autocomplete_analyzer", ca => ca
-                        .Tokenizer("edge_ngram_tokenizer")
-                        .Filter(["lowercase"])))))
+                        .Tokenizer("standard")
+                        .Filter(["lowercase", "edge_ngram_filter"])))))
             .Mappings(m => m.Properties(new Properties
             {
-                { "title", new TextProperty { Analyzer = "autocomplete_analyzer", SearchAnalyzer = "standard", Boost = 3 } },
-                { "description", new TextProperty { Analyzer = "standard" } },
+                {
+                    "title", new TextProperty
+                    {
+                        Analyzer = "standard",
+                        Fields = new Properties
+                        {
+                            { "autocomplete", new TextProperty { Analyzer = "autocomplete_analyzer", SearchAnalyzer = "standard" } }
+                        }
+                    }
+                },
+                {
+                    "description", new TextProperty
+                    {
+                        Analyzer = "standard",
+                        Fields = new Properties
+                        {
+                            { "autocomplete", new TextProperty { Analyzer = "autocomplete_analyzer", SearchAnalyzer = "standard" } }
+                        }
+                    }
+                },
                 { "tags", new KeywordProperty() },
                 { "videoId", new KeywordProperty() },
                 { "authorId", new KeywordProperty() },
                 { "publishedAtUtc", new DateProperty() },
                 { "viewsCount", new LongNumberProperty() }
             })), ct);
+
+        if (!createResponse.IsValidResponse)
+            throw new InvalidOperationException($"Failed to create Elasticsearch index '{IndexName}'. {createResponse.DebugInformation}");
+
+        logger.LogInformation("Elasticsearch index '{IndexName}' created successfully.", IndexName);
     }
 }

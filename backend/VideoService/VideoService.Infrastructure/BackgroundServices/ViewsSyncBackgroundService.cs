@@ -3,6 +3,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Shared.Domain.Interfaces;
 using VideoService.Application.Interfaces;
+using VideoService.Domain.Enums;
 
 namespace VideoService.Infrastructure.BackgroundServices;
 
@@ -35,6 +36,15 @@ public sealed class ViewsSyncBackgroundService(
 
                     video.ApplyViewsIncrement(count);
                     videoRepository.Update(video);
+
+                    if (video.Status == VideoStatus.Published && video.Visibility == VideoVisibility.Public)
+                    {
+                        var searchIndex = scope.ServiceProvider.GetRequiredService<IVideoSearchIndex>();
+                        await searchIndex.IndexVideoAsync(new VideoSearchDocument(
+                            video.Id.Value, video.Title.Value, video.Description.Value,
+                            video.Tags.Select(t => t.Value).ToList(), video.AuthorId,
+                            video.ThumbnailUrl, video.ViewsCount, video.PublishedAt ?? DateTime.UtcNow), stoppingToken);
+                    }
                 }
 
                 await unitOfWork.SaveChangesAsync(stoppingToken);

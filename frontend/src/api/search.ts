@@ -1,10 +1,41 @@
 import { apiClient } from './client';
-import type { SearchResponse } from '@/types';
+import type { SearchResponse, VideoSearchHit } from '@/types';
+
+interface RawSearchHit {
+  videoId: string;
+  title: string;
+  description: string;
+  tags: string[];
+  thumbnailUrl: string | null;
+  viewsCount: number;
+  score: number;
+  authorId: string;
+  publishedAt: string;
+}
+
+interface RawSearchResponse {
+  hits: RawSearchHit[];
+  totalCount: number;
+}
+
+function mapHit(raw: RawSearchHit): VideoSearchHit {
+  return {
+    id: raw.videoId,
+    title: raw.title,
+    description: raw.description,
+    thumbnailUrl: raw.thumbnailUrl,
+    viewsCount: raw.viewsCount,
+    authorId: raw.authorId,
+    tags: raw.tags,
+    score: raw.score,
+    createdAt: raw.publishedAt,
+  };
+}
 
 export const searchApi = {
   search: (q: string, tags: string[], page: number, pageSize: number) =>
     apiClient
-      .get<SearchResponse>('/videos/search', {
+      .get<RawSearchResponse>('/videos/search', {
         params: {
           q: q.trim() ? q.trim() : undefined,
           tags: tags.length ? tags.join(',') : undefined,
@@ -12,5 +43,10 @@ export const searchApi = {
           pageSize,
         },
       })
-      .then((r) => r.data),
+      .then(
+        (r): SearchResponse => ({
+          hits: r.data.hits.map(mapHit),
+          totalCount: r.data.totalCount,
+        })
+      ),
 };

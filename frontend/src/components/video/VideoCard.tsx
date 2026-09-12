@@ -13,14 +13,10 @@ const PLACEHOLDER_THUMB =
 
 interface VideoCardProps {
   video: VideoDto | VideoSearchHit;
-  /** Search hits don't carry authorId (see api/search.ts) -- pass it explicitly when known (e.g. from a channel page). */
   authorId?: string;
 }
 
 export function VideoCard({ video, authorId }: VideoCardProps) {
-  // Search results (VideoSearchHit) don't include authorId at all -- no
-  // channel to fetch or link to in that case. See the gap noted in
-  // src/types/index.ts.
   const { data: channel } = useChannel(authorId);
   const [thumbLoaded, setThumbLoaded] = useState(false);
 

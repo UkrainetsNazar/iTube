@@ -38,7 +38,7 @@ export interface VideoSearchHit {
   description: string;
   thumbnailUrl: string | null;
   viewsCount: number;
-  likesCount: number;
+  authorId: string;
   tags: string[];
   score: number;
   createdAt: string;
