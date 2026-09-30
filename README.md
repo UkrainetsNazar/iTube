@@ -155,7 +155,3 @@ dotnet ef migrations add <MigrationName> \
 - **FluentValidation pipeline is wired but sparsely populated.** The `ValidationBehavior<,>` MediatR pipeline behavior is registered in every service; most input validation still happens ad hoc inside command handlers via the `Result` pattern rather than dedicated `AbstractValidator<T>` classes.
 - **Gateway JWT validation is a convenience layer, not the sole auth boundary.** Each service independently validates JWTs and enforces its own authorization policy.
 - **Search index has no built-in staleness detection.** Visibility changes correctly update the index; other edits to a published video's title/description/tags do not currently re-trigger indexing.
-
-## License
-
-_Add your license here._
